@@ -1,0 +1,182 @@
+@import url('https://fonts.googleapis.com/css2?family=Rethink+Sans:wght@300;400;500;600;700;800&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Rethink Sans", "Rethink Sans Placeholder", ui-sans-serif, system-ui, sans-serif;
+  --font-inter: "Rethink Sans", "Rethink Sans Placeholder", ui-sans-serif, system-ui, sans-serif;
+  --color-primary: #D0011B;
+}
+
+@layer base {
+  *, ::before, ::after {
+    font-family: "Rethink Sans", "Rethink Sans Placeholder", ui-sans-serif, system-ui, sans-serif !important;
+  }
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  input[type="tel"],
+  input[type="url"],
+  textarea {
+    border: 1.5px solid rgba(208, 1, 27, 0.3) !important;
+    border-radius: 10px !important;
+    background: rgba(208, 1, 27, 0.04) !important;
+    color: white;
+    outline: none !important;
+    transition: border 0.2s ease, box-shadow 0.2s ease, background 0.2s ease !important;
+  }
+
+  input[type="text"]:focus,
+  input[type="email"]:focus,
+  input[type="password"]:focus,
+  input[type="number"]:focus,
+  input[type="tel"]:focus,
+  input[type="url"]:focus,
+  textarea:focus {
+    border: 1.5px solid rgba(208, 1, 27, 0.8) !important;
+    box-shadow:
+      0 0 0 3px rgba(208, 1, 27, 0.12),
+      0 0 12px rgba(208, 1, 27, 0.08),
+      inset 0 0 8px rgba(208, 1, 27, 0.04) !important;
+    background: rgba(208, 1, 27, 0.06) !important;
+    outline: none !important;
+  }
+
+  /* Light mode overrides */
+  :root:not(.dark) input[type="text"],
+  :root:not(.dark) input[type="email"],
+  :root:not(.dark) input[type="password"],
+  :root:not(.dark) input[type="number"],
+  :root:not(.dark) input[type="tel"],
+  :root:not(.dark) input[type="url"],
+  :root:not(.dark) textarea {
+    border: 1.5px solid rgba(208, 1, 27, 0.25) !important;
+    background: rgba(208, 1, 27, 0.02) !important;
+    color: #111111;
+  }
+
+  :root:not(.dark) input[type="text"]:focus,
+  :root:not(.dark) input[type="email"]:focus,
+  :root:not(.dark) input[type="password"]:focus,
+  :root:not(.dark) input[type="number"]:focus,
+  :root:not(.dark) input[type="tel"]:focus,
+  :root:not(.dark) input[type="url"]:focus,
+  :root:not(.dark) textarea:focus {
+    border: 1.5px solid rgba(208, 1, 27, 0.7) !important;
+    box-shadow:
+      0 0 0 3px rgba(208, 1, 27, 0.10),
+      0 0 10px rgba(208, 1, 27, 0.06),
+      inset 0 0 8px rgba(208, 1, 27, 0.04) !important;
+    background: rgba(208, 1, 27, 0.04) !important;
+  }
+}
+
+@variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  body {
+    @apply font-sans;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.2); }
+}
+
+.animate-pulse-custom {
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(120%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideOutRight {
+  from { transform: translateX(0); opacity: 1; }
+  to { transform: translateX(120%); opacity: 0; }
+}
+
+.animate-slide-in {
+  animation: slideInRight 0.4s ease forwards;
+}
+
+.animate-slide-out {
+  animation: slideOutRight 0.3s ease forwards;
+}
+
+/* Custom shiny button styling matching provided specifications */
+.btn-custom {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: linear-gradient(180deg, #E21B33 0%, #D0011B 50%, #B00014 100%) !important;
+  color: #ffffff !important;
+  font-size: 18px;
+  font-weight: 500 !important;
+  letter-spacing: -0.01em;
+  padding: 14px 42px;
+  border-radius: 9999px !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  box-shadow: 
+    0 4px 15px rgba(208, 1, 27, 0.4),
+    inset 0 2px 4px rgba(255, 255, 255, 0.2),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.2) !important;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  cursor: pointer !important;
+  user-select: none !important;
+}
+
+.btn-custom:hover {
+  transform: translateY(-2px) !important;
+  background: linear-gradient(180deg, #F52D46 0%, #E21B33 50%, #C40018 100%) !important;
+  box-shadow: 
+    0 6px 20px rgba(208, 1, 27, 0.6), 
+    inset 0 2px 4px rgba(255, 255, 255, 0.3),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.2) !important;
+}
+
+.btn-custom:active {
+  transform: translateY(1px) !important;
+  background: linear-gradient(180deg, #B00014 0%, #D0011B 100%) !important;
+  box-shadow: 
+    0 2px 8px rgba(208, 1, 27, 0.4),
+    inset 0 1px 2px rgba(0, 0, 0, 0.3) !important;
+}
+
+.btn-custom svg {
+  transition: transform 0.25s ease !important;
+}
+
+.btn-custom:hover svg {
+  transform: translateX(4px) !important;
+}
+
+/* Elegant Tech Hybrid Dot-Line Grid Overlay for Dark Mode */
+.dark-grid-pattern {
+  background-image: 
+    radial-gradient(rgba(208, 1, 27, 0.1) 1px, transparent 1px),
+    linear-gradient(to right, rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+  background-size: 24px 24px, 48px 48px, 48px 48px;
+}
+
+.gradient-title {
+  background: linear-gradient(135deg, #111111 0%, #3d0006 50%, #d0011b 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+}
+
+.dark .gradient-title {
+  background: linear-gradient(135deg, #ffffff 0%, #e9e5ff 40%, #b29eff 75%, #d0011b 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+}
+
