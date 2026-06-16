@@ -204,7 +204,16 @@ export default function Login({ onLogin, onBack }: LoginProps) {
         return;
       }
 
-      // 4. Sucesso! Configurar sessão local
+      // 4. Sucesso! Vincular o ID do Auth com o registro na tabela users_shopspy
+      const authUserId = loginData.user?.id;
+      if (authUserId) {
+        await supabase
+          .from('users_shopspy')
+          .update({ id: authUserId })
+          .eq('email', email.toLowerCase().trim());
+      }
+
+      // 5. Configurar sessão local
       localStorage.setItem('shopspy_auth', 'true');
       localStorage.setItem('shopspy_is_admin', 'false');
       localStorage.setItem('shopspy_user_email', email.toLowerCase().trim());
