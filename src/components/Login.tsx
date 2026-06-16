@@ -152,7 +152,8 @@ export default function Login({ onLogin, onBack }: LoginProps) {
         .maybeSingle();
 
       if (!userData) {
-        setErrorMsg('E-mail não encontrado. Verifique se usou o mesmo e-mail da compra.');
+        console.warn('Registro: e-mail não encontrado na tabela users_shopspy:', email);
+        setErrorMsg('E-mail não encontrado no sistema de vendas. Verifique se usou o mesmo e-mail da compra ou se o pagamento foi aprovado.');
         setIsLoading(false);
         return;
       }

@@ -41,14 +41,44 @@ serve(async (req) => {
       .select()
     const logId = logData?.[0]?.id
 
-    // Extrair dados do cliente
-    const customer = payload.customer || payload.buyer || payload.client || {}
-    const email = (customer.email || payload.email || payload.customer_email || '').toLowerCase().trim()
-    const name = customer.name || payload.name || payload.customer_name || 'Usuário ShopSpy'
+    // Extrair dados do cliente de forma mais robusta (case-insensitive e múltiplos campos)
+    const findValue = (obj: any, ...keys: string[]) => {
+      for (const key of keys) {
+        if (obj && obj[key]) return obj[key];
+        // Busca case-insensitive
+        const found = Object.keys(obj || {}).find(k => k.toLowerCase() === key.toLowerCase());
+        if (found) return obj[found];
+      }
+      return null;
+    };
 
-    if (!email) {
-      console.warn('Webhook sem email:', JSON.stringify(payload))
-      return new Response(JSON.stringify({ success: true, message: 'No email' }), {
+    const customer = payload.customer || payload.buyer || payload.client || payload.Customer || payload.Client || {};
+    
+    // Tenta encontrar o email em várias fontes comuns
+    let rawEmail = findValue(customer, 'email', 'customer_email', 'client_email') || 
+                   findValue(payload, 'email', 'customer_email', 'client_email', 'buyer_email');
+    
+    // Tenta encontrar o nome em várias fontes comuns
+    let rawName = findValue(customer, 'name', 'customer_name', 'client_name', 'first_name') || 
+                  findValue(payload, 'name', 'customer_name', 'client_name', 'full_name') || 
+                  'Usuário ShopSpy';
+
+    // Se o email extraído não contiver '@', pode ser que pegou o nome por engano (alguns provedores trocam os campos)
+    if (rawEmail && !rawEmail.includes('@') && rawName && rawName.includes('@')) {
+      console.log('Detectada troca de campos Email/Nome. Corrigindo...');
+      const temp = rawEmail;
+      rawEmail = rawName;
+      rawName = temp;
+    }
+
+    const email = String(rawEmail || '').toLowerCase().trim();
+    const name = String(rawName || '').trim();
+
+    console.log(`Dados Extraídos -> Email: ${email} | Nome: ${name}`);
+
+    if (!email || !email.includes('@')) {
+      console.warn('Webhook rejeitado: Email ausente ou inválido:', JSON.stringify(payload));
+      return new Response(JSON.stringify({ success: false, message: 'Invalid or missing email' }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200
       })
     }
