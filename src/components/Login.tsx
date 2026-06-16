@@ -48,39 +48,39 @@ export default function Login({ onLogin, onBack }: LoginProps) {
         return;
       }
 
-      // Verificar se usuário está ativo e plano válido
+      // 2. Verificar se usuário está ativo na nossa tabela de vendas
+      // Primeiro tentamos pelo ID
       let { data: userData, error: dbError } = await supabase
         .from('users_shopspy')
         .select('is_active, plan, plan_expires_at')
         .eq('id', data.user.id)
-        .single();
+        .maybeSingle();
+
+      // Se não achar por ID, tenta por e-mail (sincronização de leads/vendas)
+      if (!userData && data.user.email) {
+        const { data: leadData } = await supabase
+          .from('users_shopspy')
+          .select('is_active, plan, plan_expires_at')
+          .eq('email', data.user.email.toLowerCase().trim())
+          .maybeSingle();
+        
+        if (leadData) {
+          // Vincular o ID do Auth ao registro existente por e-mail
+          await supabase
+            .from('users_shopspy')
+            .update({ id: data.user.id })
+            .eq('email', data.user.email.toLowerCase().trim());
+          
+          userData = leadData;
+          dbError = null;
+        }
+      }
 
       if (dbError || !userData) {
-        // Auto-provisionamento de segurança para novos usuários criados no Supabase
-        if (data.user && data.user.email) {
-          const { error: insertError } = await supabase
-            .from('users_shopspy')
-            .insert({
-              id: data.user.id,
-              email: data.user.email,
-              name: 'Usuário ShopSpy',
-              plan: 'vitalicio',
-              plan_expires_at: null,
-              is_active: true
-            });
-
-          if (!insertError) {
-            const { data: reloadedData } = await supabase
-              .from('users_shopspy')
-              .select('is_active, plan, plan_expires_at')
-              .eq('id', data.user.id)
-              .single();
-            if (reloadedData) {
-              userData = reloadedData;
-              dbError = null;
-            }
-          }
-        }
+        setErrorMsg('E-mail não encontrado no sistema de vendas. Se você trocou o e-mail na hora da compra, use o e-mail original para entrar.');
+        await supabase.auth.signOut();
+        setIsLoading(false);
+        return;
       }
 
       // Garantir que o plano do usuário seja atualizado para Vitalício
