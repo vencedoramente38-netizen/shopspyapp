@@ -95,6 +95,37 @@ export default function AdminPanel({ isOpen, onClose }: AdminPanelProps) {
   const [chartPeriod, setChartPeriod] = useState(() => localStorage.getItem('shopspy_chart_period') || 'Hoje');
   const [welcomeMessage, setWelcomeMessage] = useState(() => localStorage.getItem('shopspy_welcome_message') || '');
 
+  // Dashboard Control States (10 fields)
+  const [dashValues, setDashValues] = useState(() => ({
+    total_vendas: localStorage.getItem('shopspy_admin_total_vendas') || '0',
+    receita_total: localStorage.getItem('shopspy_admin_receita_total') || '0,00',
+    vendas_pendentes: localStorage.getItem('shopspy_admin_vendas_pendentes') || '0',
+    vendas_falhadas: localStorage.getItem('shopspy_admin_vendas_falhadas') || '0',
+    cliques: localStorage.getItem('shopspy_admin_cliques') || '0',
+    pedidos: localStorage.getItem('shopspy_admin_pedidos') || '0',
+    comissao: localStorage.getItem('shopspy_admin_comissao') || '0,00',
+    itens_vendidos: localStorage.getItem('shopspy_admin_itens_vendidos') || '0',
+    valor_pedido: localStorage.getItem('shopspy_admin_valor_pedido') || '0,00',
+    novos_compradores: localStorage.getItem('shopspy_admin_novos_compradores') || '0',
+  }));
+
+  const [dashVariations, setDashVariations] = useState(() => ({
+    total_vendas: localStorage.getItem('shopspy_admin_var_total_vendas') || '+0.0%',
+    receita_total: localStorage.getItem('shopspy_admin_var_receita_total') || '+0.0%',
+    vendas_pendentes: localStorage.getItem('shopspy_admin_var_vendas_pendentes') || '+0.0%',
+    vendas_falhadas: localStorage.getItem('shopspy_admin_var_vendas_falhadas') || '+0.0%',
+    cliques: localStorage.getItem('shopspy_admin_var_cliques') || '+0.0%',
+    pedidos: localStorage.getItem('shopspy_admin_var_pedidos') || '+0.0%',
+    comissao: localStorage.getItem('shopspy_admin_var_comissao') || '+0.0%',
+    itens_vendidos: localStorage.getItem('shopspy_admin_var_itens_vendidos') || '+0.0%',
+    valor_pedido: localStorage.getItem('shopspy_admin_var_valor_pedido') || '+0.0%',
+    novos_compradores: localStorage.getItem('shopspy_admin_var_novos_compradores') || '+0.0%',
+  }));
+
+  const [showAddSale, setShowAddSale] = useState(false);
+  const [manualSaleProduct, setManualSaleProduct] = useState('');
+  const [manualSaleValue, setManualSaleValue] = useState('');
+
   // Sidebar visibility states
   const [tabDashboard, setTabDashboard] = useState(() => localStorage.getItem('shopspy_tab_dashboard') !== 'false');
   const [tabProducts, setTabProducts] = useState(() => localStorage.getItem('shopspy_tab_products') !== 'false');
@@ -111,10 +142,6 @@ export default function AdminPanel({ isOpen, onClose }: AdminPanelProps) {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.ctrlKey && e.key === 'p') {
-        e.preventDefault();
-        setShowPasswordModal(true);
-      }
       if (e.key === 'Escape') {
         setShowPasswordModal(false);
         onClose();
@@ -278,6 +305,14 @@ export default function AdminPanel({ isOpen, onClose }: AdminPanelProps) {
     localStorage.setItem('shopspy_tab_referral', String(tabReferral));
     localStorage.setItem('shopspy_tab_settings', String(tabSettings));
 
+    // Save dashboard values and variations
+    Object.entries(dashValues).forEach(([key, value]) => {
+      localStorage.setItem(`shopspy_admin_${key}`, String(value));
+    });
+    Object.entries(dashVariations).forEach(([key, value]) => {
+      localStorage.setItem(`shopspy_admin_var_${key}`, String(value));
+    });
+
     // Notify other components (Dashboard, App loop) to reload their state instantly
     window.dispatchEvent(new CustomEvent('shopspy_settings_updated'));
 
@@ -286,6 +321,30 @@ export default function AdminPanel({ isOpen, onClose }: AdminPanelProps) {
       onClose();
       setIsAuthenticated(false);
     }, 1000);
+  };
+
+  const handleManualSale = () => {
+    if (!manualSaleProduct || !manualSaleValue) {
+      showToast('⚠️ Preencha o produto e valor!');
+      return;
+    }
+
+    const price = parseFloat(manualSaleValue.replace(/\./g, '').replace(',', '.').trim());
+    if (isNaN(price)) {
+      showToast('⚠️ Valor inválido!');
+      return;
+    }
+
+    window.dispatchEvent(new CustomEvent('shopspy_sale', {
+      detail: {
+        productId: parseInt(manualSaleProduct),
+        price: price
+      }
+    }));
+    
+    showToast('✅ Venda manual adicionada!');
+    setShowAddSale(false);
+    setManualSaleValue('');
   };
 
   const playSoundPreview = (name: string) => {
@@ -668,133 +727,129 @@ export default function AdminPanel({ isOpen, onClose }: AdminPanelProps) {
               <div className={`${colors.card} border ${colors.borderSubtle} rounded-[16px] p-5 shadow-sm transition-colors`}>
                 <div className="flex items-center gap-3 mb-4">
                   <LayoutDashboard size={18} className="text-[#D0011B]" />
-                  <span className={`text-sm font-bold ${colors.text}`}>Controle do Dashboard</span>
+                  <span className={`text-sm font-bold ${colors.text}`}>Controle da Dashboard</span>
                 </div>
                 <div className={`h-px ${colors.borderSubtle} mb-6`} />
 
                 <div className="space-y-6">
-                  {/* VENDAS HOJE */}
-                  <div className="space-y-2">
-                    <label className={`text-[11px] ${colors.muted} uppercase font-black tracking-widest`}>Valor de Vendas Hoje</label>
-                    <input 
-                      type="text"
-                      value={dashSales}
-                      onChange={(e) => setDashSales(e.target.value)}
-                      placeholder="2.353,90"
-                      className={`w-full ${colors.input} border ${colors.border} rounded-[10px] px-4 py-3 ${colors.text} text-[14px] outline-none focus:border-[#D0011B] transition-colors`}
-                    />
-                  </div>
-
-                  {/* MÉTRICAS PRINCIPAIS */}
-                  <div className="space-y-4">
-                    <label className={`text-[11px] ${colors.muted} uppercase font-black tracking-widest`}>Métricas Principais</label>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="space-y-1.5">
-                        <span className={`text-[10px] ${colors.muted} ml-1`}>Visitantes</span>
-                        <input 
-                          type="text"
-                          value={metricVisitors}
-                          onChange={(e) => setMetricVisitors(e.target.value)}
-                          className={`w-full ${colors.input} border ${colors.border} rounded-[8px] px-3 py-2.5 ${colors.text} text-[13px] outline-none focus:border-[#D0011B] transition-colors`}
-                        />
-                      </div>
-                      <div className="space-y-1.5">
-                        <span className={`text-[10px] ${colors.muted} ml-1`}>Visualizações</span>
-                        <input 
-                          type="text"
-                          value={metricViews}
-                          onChange={(e) => setMetricViews(e.target.value)}
-                          className={`w-full ${colors.input} border ${colors.border} rounded-[8px] px-3 py-2.5 ${colors.text} text-[13px] outline-none focus:border-[#D0011B] transition-colors`}
-                        />
-                      </div>
-                      <div className="space-y-1.5">
-                        <span className={`text-[10px] ${colors.muted} ml-1`}>Pedidos</span>
-                        <input 
-                          type="text"
-                          value={metricOrders}
-                          onChange={(e) => setMetricOrders(e.target.value)}
-                          className={`w-full ${colors.input} border ${colors.border} rounded-[8px] px-3 py-2.5 ${colors.text} text-[13px] outline-none focus:border-[#D0011B] transition-colors`}
-                        />
-                      </div>
-                      <div className="space-y-1.5">
-                        <span className={`text-[10px] ${colors.muted} ml-1`}>Unidades</span>
-                        <input 
-                          type="text"
-                          value={metricUnits}
-                          onChange={(e) => setMetricUnits(e.target.value)}
-                          className={`w-full ${colors.input} border ${colors.border} rounded-[8px] px-3 py-2.5 ${colors.text} text-[13px] outline-none focus:border-[#D0011B] transition-colors`}
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* SIMULAR VENDAS / ZERAR METRICAS */}
-                  <div className="pt-2 grid grid-cols-2 gap-3">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const randomProduct = allProductsList[Math.floor(Math.random() * allProductsList.length)];
-                        if (!randomProduct) return;
-                        const cleanPrice = parseFloat(randomProduct.preco.replace('R$', '').replace(/\./g, '').replace(',', '.').trim()) || 49.90;
-                        window.dispatchEvent(new CustomEvent('shopspy_sale', {
-                          detail: {
-                            productId: randomProduct.id,
-                            price: cleanPrice
-                          }
-                        }));
-                        showToast('⚡ Venda simulada enviada para o Dashboard!');
-                      }}
-                      className="py-2.5 px-3 bg-[#D0011B]/10 hover:bg-[#D0011B]/20 text-[#D0011B] border border-[#D0011B]/20 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 active:scale-95 cursor-pointer border-none"
-                    >
-                      <span>Simular Venda</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (confirm('Deseja realmente zerar todas as métricas da Dashboard?')) {
-                          setDashSales('0,00');
-                          setMetricVisitors('0');
-                          setMetricViews('0');
-                          setMetricOrders('0');
-                          setMetricUnits('0');
-                          localStorage.setItem('shopspy_dashboard_sales', '0,00');
-                          localStorage.setItem('shopspy_metric_visitors', '0');
-                          localStorage.setItem('shopspy_metric_views', '0');
-                          localStorage.setItem('shopspy_metric_orders', '0');
-                          localStorage.setItem('shopspy_metric_units', '0');
-                          localStorage.setItem('shopspy_recent_sales', '[]');
-                          window.dispatchEvent(new CustomEvent('shopspy_settings_updated'));
-                          showToast('📊 Dashboard zerada!');
-                        }
-                      }}
-                      className="py-2.5 px-3 bg-neutral-500/10 hover:bg-neutral-500/20 text-neutral-400 border border-neutral-500/20 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 active:scale-95 cursor-pointer border-none"
-                    >
-                      <span>Zerar Métricas</span>
-                    </button>
-                  </div>
-
-                  {/* TOP 5 PRODUTOS */}
-                <div className="space-y-3">
-                  <div className="space-y-1">
-                    <label className={`text-[11px] ${colors.muted} uppercase font-black tracking-widest`}>Top 5 Produtos</label>
-                    <p className={`text-[11px] ${colors.muted}`}>Escolha quais aparecem no Top 5</p>
-                  </div>
-                  <div className="max-h-[200px] overflow-y-auto custom-scrollbar space-y-2 pr-2">
-                    {allProductsList.map(p => (
-                      <div 
-                        key={p.id}
-                        onClick={() => toggleTop5(p.id)}
-                        className={`flex items-center gap-3 p-2 border ${colors.borderSubtle} rounded-lg cursor-pointer hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition-colors ${top5Products.includes(p.id) ? (theme === 'dark' ? 'bg-white/[0.04] border-white/[0.1]' : 'bg-black/[0.02] border-black/[0.1]') : ''}`}
-                      >
-                        <div className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 transition-all ${top5Products.includes(p.id) ? 'bg-[#D0011B] border-transparent' : 'border-black/20 dark:border-white/20'}`}>
-                          {top5Products.includes(p.id) && <Check size={12} className="text-white" />}
+                  {/* GRID DE MÉTRICAS */}
+                  <div className="grid grid-cols-2 gap-x-4 gap-y-6">
+                    {[
+                      { key: 'total_vendas', label: 'Total de Vendas', placeholder: '0' },
+                      { key: 'receita_total', label: 'Receita Total (R$)', placeholder: '0,00' },
+                      { key: 'vendas_pendentes', label: 'Vendas Pendentes', placeholder: '0' },
+                      { key: 'vendas_falhadas', label: 'Vendas Falhadas', placeholder: '0' },
+                      { key: 'cliques', label: 'Cliques', placeholder: '0' },
+                      { key: 'pedidos', label: 'Pedidos', placeholder: '0' },
+                      { key: 'comissao', label: 'Comissão Est. (R$)', placeholder: '0,00' },
+                      { key: 'itens_vendidos', label: 'Itens Vendidos', placeholder: '0' },
+                      { key: 'valor_pedido', label: 'Valor do Pedido (R$)', placeholder: '0,00' },
+                      { key: 'novos_compradores', label: 'Novos Compradores', placeholder: '0' },
+                    ].map((field) => (
+                      <div key={field.key} className="space-y-3">
+                        <div className="space-y-1">
+                          <label className={`text-[11px] ${colors.muted} uppercase font-black tracking-widest block`}>{field.label}</label>
+                          <input 
+                            type="text"
+                            value={(dashValues as any)[field.key]}
+                            onChange={(e) => setDashValues(prev => ({ ...prev, [field.key]: e.target.value }))}
+                            placeholder={field.placeholder}
+                            className={`w-full ${colors.input} border ${colors.border} rounded-lg px-3 py-2.5 ${colors.text} text-[13px] outline-none focus:border-[#D0011B] transition-colors`}
+                          />
                         </div>
-                        <img src={p.imagem} className="w-7 h-7 rounded object-cover" />
-                        <span className={`text-[12px] ${colors.muted} truncate flex-1`}>{p.nome}</span>
+                        <div className="space-y-1">
+                          <span className={`text-[10px] ${colors.muted} ml-1`}>Variação (%)</span>
+                          <input 
+                            type="text"
+                            value={(dashVariations as any)[field.key]}
+                            onChange={(e) => setDashVariations(prev => ({ ...prev, [field.key]: e.target.value }))}
+                            placeholder="+0.0%"
+                            className={`w-full ${colors.input} border ${colors.border} rounded-lg px-3 py-2 ${colors.text} text-[12px] outline-none focus:border-[#D0011B] transition-colors`}
+                          />
+                        </div>
                       </div>
                     ))}
                   </div>
-                </div>
+
+                  {/* VENDAS RECENTES — ADICIONAR MANUAL */}
+                  <div className={`mt-8 pt-6 border-t ${colors.borderSubtle}`}>
+                    <div className="flex items-center justify-between mb-4">
+                      <span className={`text-[13px] font-bold ${colors.text}`}>Vendas Recentes</span>
+                      <button 
+                        onClick={() => setShowAddSale(!showAddSale)}
+                        className="text-[11px] font-bold text-[#D0011B] hover:underline"
+                      >
+                        {showAddSale ? 'Cancelar' : '+ Adicionar Venda Manual'}
+                      </button>
+                    </div>
+
+                    <AnimatePresence>
+                      {showAddSale && (
+                        <motion.div 
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: 'auto', opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          className="space-y-3 mb-6 overflow-hidden"
+                        >
+                          <div className="grid grid-cols-2 gap-3">
+                            <div className="space-y-1">
+                              <label className={`text-[10px] ${colors.muted} uppercase font-black`}>Produto</label>
+                              <select 
+                                value={manualSaleProduct}
+                                onChange={(e) => setManualSaleProduct(e.target.value)}
+                                className={`w-full ${colors.input} border ${colors.border} rounded-lg px-3 py-2 ${colors.text} text-[12px] outline-none focus:border-[#D0011B] appearance-none`}
+                              >
+                                <option value="">Selecionar...</option>
+                                {allProductsList.map(p => (
+                                  <option key={p.id} value={p.id}>{p.nome}</option>
+                                ))}
+                              </select>
+                            </div>
+                            <div className="space-y-1">
+                              <label className={`text-[10px] ${colors.muted} uppercase font-black`}>Valor (R$)</label>
+                              <input 
+                                type="text"
+                                value={manualSaleValue}
+                                onChange={(e) => setManualSaleValue(e.target.value)}
+                                placeholder="49,90"
+                                className={`w-full ${colors.input} border ${colors.border} rounded-lg px-3 py-2 ${colors.text} text-[12px] outline-none focus:border-[#D0011B]`}
+                              />
+                            </div>
+                          </div>
+                          <button 
+                            onClick={handleManualSale}
+                            className="w-full bg-[#D0011B] text-white py-2.5 rounded-lg font-bold text-[13px] hover:brightness-110 transition-all shadow-lg shadow-[#D0011B]/10"
+                          >
+                            Adicionar Venda
+                          </button>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+
+                  {/* TOP 5 PRODUTOS */}
+                  <div className="space-y-3 pt-4 border-t border-white/[0.05]">
+                    <div className="space-y-1">
+                      <label className={`text-[11px] ${colors.muted} uppercase font-black tracking-widest block`}>Top 5 Produtos — Controle</label>
+                      <p className={`text-[11px] ${colors.muted}`}>Escolha no máximo 5 produtos para destacar</p>
+                    </div>
+                    <div className="max-h-[200px] overflow-y-auto custom-scrollbar space-y-2 pr-2">
+                      {allProductsList.map(p => (
+                        <div 
+                          key={p.id}
+                          onClick={() => toggleTop5(p.id)}
+                          className={`flex items-center gap-3 p-2 border ${colors.borderSubtle} rounded-lg cursor-pointer hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition-colors ${top5Products.includes(p.id) ? (theme === 'dark' ? 'bg-white/[0.04] border-white/[0.1]' : 'bg-black/[0.02] border-black/[0.1]') : ''}`}
+                        >
+                          <div className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 transition-all ${top5Products.includes(p.id) ? 'bg-[#D0011B] border-transparent' : 'border-black/20 dark:border-white/20'}`}>
+                            {top5Products.includes(p.id) && <Check size={12} className="text-white" />}
+                          </div>
+                          <img src={p.imagem} className="w-7 h-7 rounded object-cover" />
+                          <span className={`text-[12px] ${colors.muted} truncate flex-1`}>{p.nome}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
 
                   {/* GRÁFICO */}
                   <div className="space-y-4">

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Settings as SettingsIcon, Palette, Sun, Moon, CheckCircle } from 'lucide-react';
+import { Settings as SettingsIcon, Palette, Sun, Moon, CheckCircle, Shield } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 interface SettingsProps {
@@ -9,6 +9,21 @@ interface SettingsProps {
 
 const Settings: React.FC<SettingsProps> = ({ isDarkMode, toggleTheme }) => {
   const [feedback, setFeedback] = useState<string | null>(null);
+
+  const ADMIN_PANEL_PASSWORD = 'SHOPSPY4692';
+  const [adminPassword, setAdminPassword] = useState('');
+  const [adminUnlocked, setAdminUnlocked] = useState(false);
+  const [adminError, setAdminError] = useState('');
+
+  const handleAdminUnlock = () => {
+    if (adminPassword === ADMIN_PANEL_PASSWORD) {
+      setAdminUnlocked(true);
+      setAdminError('');
+    } else {
+      setAdminError('Senha incorreta. Tente novamente.');
+      setAdminPassword('');
+    }
+  };
 
   return (
     <div className="flex-1 bg-gray-50 dark:bg-[#0a0a0a] p-6 min-h-screen font-sans transition-colors duration-300">
@@ -77,6 +92,81 @@ const Settings: React.FC<SettingsProps> = ({ isDarkMode, toggleTheme }) => {
             </div>
           </div>
         </section>
+
+        {/* ÁREA ADMINISTRATIVA */}
+        {localStorage.getItem('shopspy_is_admin') === 'true' && (
+          <div style={{
+            marginTop: 32,
+            background: '#111111',
+            border: '1px solid rgba(208,1,27,0.2)',
+            borderRadius: 14,
+            padding: 20
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
+              <Shield size={18} color="#D0011B" />
+              <span style={{ color: 'white', fontWeights: 700, fontSize: 15 }}>Área Administrativa</span>
+            </div>
+
+            {!adminUnlocked ? (
+              <>
+                <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: 13, marginBottom: 12 }}>
+                  Digite a senha para acessar o painel de administração.
+                </p>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <input
+                    type="password"
+                    placeholder="Senha do painel admin..."
+                    value={adminPassword}
+                    onChange={e => setAdminPassword(e.target.value)}
+                    onKeyDown={e => e.key === 'Enter' && handleAdminUnlock()}
+                    style={{ 
+                      flex: 1,
+                      background: '#1a1a1a',
+                      border: '1px solid rgba(255,255,255,0.08)',
+                      borderRadius: 10,
+                      padding: '12px 14px',
+                      color: 'white',
+                      fontSize: 14,
+                      outline: 'none'
+                    }}
+                  />
+                  <button onClick={handleAdminUnlock} style={{
+                    background: '#D0011B', color: 'white',
+                    borderRadius: 10, padding: '12px 20px',
+                    fontWeight: 700, fontSize: 14, border: 'none', cursor: 'pointer'
+                  }}>
+                    Entrar
+                  </button>
+                </div>
+                {adminError && (
+                  <p style={{ color: '#ef4444', fontSize: 12, marginTop: 8 }}>{adminError}</p>
+                )}
+              </>
+            ) : (
+              <button
+                onClick={() => {
+                  // This dispatches an event that App.tsx can listen to if needed, 
+                  // but here we just need to set the state in App.tsx.
+                  // Since Settings is a child of App, we might need a prop to open it.
+                  // Looking at App.tsx, it uses isAdminPanelOpen state.
+                  // Re-reading App.tsx, SettingsView doesn't have a prop to open AdminPanel.
+                  // I should probably use a CustomEvent to open it from here.
+                  window.dispatchEvent(new CustomEvent('shopspy_open_admin'));
+                }}
+                style={{
+                  width: '100%', background: 'linear-gradient(135deg, #D0011B, #ff4444)',
+                  color: 'white', borderRadius: 10, padding: '14px',
+                  fontWeight: 700, fontSize: 15, border: 'none', cursor: 'pointer',
+                  boxShadow: '0 4px 20px rgba(208,1,27,0.4)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8
+                }}
+              >
+                <SettingsIcon size={18} /> Abrir Painel de Administração
+              </button>
+            )}
+          </div>
+        )}
+
       </div>
     </div>
   );

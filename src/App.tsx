@@ -40,6 +40,7 @@ export default function App() {
     // Ler do localStorage na inicialização
     return localStorage.getItem('shopspy_auth') === 'true';
   });
+  const isAdmin = localStorage.getItem('shopspy_is_admin') === 'true';
   const [showLanding, setShowLanding] = useState(!isLoggedIn);
   const [activeView, setActiveView] = useState('dashboard');
   const [isReferralModalOpen, setIsReferralModalOpen] = useState(false);
@@ -193,6 +194,15 @@ export default function App() {
     };
     window.addEventListener('shopspy_settings_updated', handleSettingsUpdate);
     return () => window.removeEventListener('shopspy_settings_updated', handleSettingsUpdate);
+  }, []);
+
+  // Listener for opening admin panel from Settings
+  useEffect(() => {
+    const handleOpenAdmin = () => {
+      setIsAdminPanelOpen(true);
+    };
+    window.addEventListener('shopspy_open_admin', handleOpenAdmin);
+    return () => window.removeEventListener('shopspy_open_admin', handleOpenAdmin);
   }, []);
 
   // Sale notification interval
@@ -435,10 +445,12 @@ export default function App() {
         </div>
       </main>
 
-      <AdminPanel 
-        isOpen={isAdminPanelOpen} 
-        onClose={() => setIsAdminPanelOpen(false)} 
-      />
+      {isAdmin && isAdminPanelOpen && (
+        <AdminPanel 
+          isOpen={isAdminPanelOpen} 
+          onClose={() => setIsAdminPanelOpen(false)} 
+        />
+      )}
 
       <ProductModal 
         product={selectedProduct}

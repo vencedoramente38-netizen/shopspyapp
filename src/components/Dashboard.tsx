@@ -178,6 +178,9 @@ export default function Dashboard({ products: productsProp, isDarkMode = true }:
       setViews(parseSavedInt('shopspy_metric_views', 0));
       setOrders(parseSavedInt('shopspy_metric_orders', 0));
       setUnits(parseSavedInt('shopspy_metric_units', 0));
+      
+      // Trigger a re-render of useMemo by forcing a state update if needed
+      // but usually the event itself is enough to trigger the components listening to it
       try {
         const saved = localStorage.getItem('shopspy_recent_sales');
         setRecentSales(saved ? JSON.parse(saved) : []);
@@ -298,6 +301,35 @@ export default function Dashboard({ products: productsProp, isDarkMode = true }:
     };
   }, [activePeriod, salesTotal, visitors, views, orders, units]);
 
+  // Admin Overrides for Metrics
+  const adminMetricsOverride = useMemo(() => {
+    const getVal = (key: string) => localStorage.getItem(`shopspy_admin_${key}`);
+    const getVar = (key: string) => localStorage.getItem(`shopspy_admin_var_${key}`);
+
+    return {
+      total_vendas: getVal('total_vendas'),
+      receita_total: getVal('receita_total'),
+      vendas_pendentes: getVal('vendas_pendentes'),
+      vendas_falhadas: getVal('vendas_falhadas'),
+      cliques: getVal('cliques'),
+      pedidos: getVal('pedidos'),
+      comissao: getVal('comissao'),
+      itens_vendidos: getVal('itens_vendidos'),
+      valor_pedido: getVal('valor_pedido'),
+      novos_compradores: getVal('novos_compradores'),
+      var_total_vendas: getVar('total_vendas'),
+      var_receita_total: getVar('receita_total'),
+      var_vendas_pendentes: getVar('vendas_pendentes'),
+      var_vendas_falhadas: getVar('vendas_falhadas'),
+      var_cliques: getVar('cliques'),
+      var_pedidos: getVar('pedidos'),
+      var_comissao: getVar('comissao'),
+      var_itens_vendidos: getVar('itens_vendidos'),
+      var_valor_pedido: getVar('valor_pedido'),
+      var_novos_compradores: getVar('novos_compradores'),
+    };
+  }, [salesTotal, visitors, views, orders, units]); // Listen to changes triggered by events
+
   // Recharts dynamic chart data based on active Period pill and computed sub-period sale total
   const dynamicChartData = useMemo(() => {
     let labels = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
@@ -347,12 +379,42 @@ export default function Dashboard({ products: productsProp, isDarkMode = true }:
 
   // Metric grid spec items computed according to the selected period
   const metrics = [
-    { label: 'Cliques', value: formatNumberHidden(currentPeriodData.visitors), change: currentPeriodData.changeSales, icon: 'MousePointer' },
-    { label: 'Pedidos', value: formatNumberHidden(currentPeriodData.orders), change: currentPeriodData.changeOrders, icon: 'ShoppingBag' },
-    { label: `Comissão est. (${activeCurrency})`, value: formatCurrency(currentPeriodData.sales * 0.1), change: currentPeriodData.changeSales, icon: 'DollarSign' },
-    { label: 'Itens vendidos', value: formatNumberHidden(currentPeriodData.units), change: currentPeriodData.changeOrders, icon: 'Package' },
-    { label: `Valor do pedido (${activeCurrency})`, value: currentPeriodData.orders > 0 ? formatCurrency(currentPeriodData.sales / currentPeriodData.orders) : formatCurrency(0), change: '0%', icon: 'TrendingUp' },
-    { label: 'Novos compradores', value: formatNumberHidden(Math.round(currentPeriodData.visitors * 0.12)), change: '', icon: 'Users' },
+    { 
+      label: 'Cliques', 
+      value: showValues ? (adminMetricsOverride.cliques || currentPeriodData.visitors) : '••••', 
+      change: adminMetricsOverride.var_cliques || currentPeriodData.changeSales, 
+      icon: 'MousePointer' 
+    },
+    { 
+      label: 'Pedidos', 
+      value: showValues ? (adminMetricsOverride.pedidos || currentPeriodData.orders) : '••••', 
+      change: adminMetricsOverride.var_pedidos || currentPeriodData.changeOrders, 
+      icon: 'ShoppingBag' 
+    },
+    { 
+      label: `Comissão est. (${activeCurrency})`, 
+      value: showValues ? (adminMetricsOverride.comissao ? (activeCurrency === 'BRL' ? `R$ ${adminMetricsOverride.comissao}` : formatCurrency(parseSavedFloat(`shopspy_admin_comissao`, 0))) : formatCurrency(currentPeriodData.sales * 0.1)) : '••••', 
+      change: adminMetricsOverride.var_comissao || currentPeriodData.changeSales, 
+      icon: 'DollarSign' 
+    },
+    { 
+      label: 'Itens vendidos', 
+      value: showValues ? (adminMetricsOverride.itens_vendidos || currentPeriodData.units) : '••••', 
+      change: adminMetricsOverride.var_itens_vendidos || currentPeriodData.changeOrders, 
+      icon: 'Package' 
+    },
+    { 
+      label: `Valor do pedido (${activeCurrency})`, 
+      value: showValues ? (adminMetricsOverride.valor_pedido ? (activeCurrency === 'BRL' ? `R$ ${adminMetricsOverride.valor_pedido}` : formatCurrency(parseSavedFloat(`shopspy_admin_valor_pedido`, 0))) : (currentPeriodData.orders > 0 ? formatCurrency(currentPeriodData.sales / currentPeriodData.orders) : formatCurrency(0))) : '••••', 
+      change: adminMetricsOverride.var_valor_pedido || '0%', 
+      icon: 'TrendingUp' 
+    },
+    { 
+      label: 'Novos compradores', 
+      value: showValues ? (adminMetricsOverride.novos_compradores || Math.round(currentPeriodData.visitors * 0.12)) : '••••', 
+      change: adminMetricsOverride.var_novos_compradores || '', 
+      icon: 'Users' 
+    },
   ];
 
   const getMetricIcon = (iconName: string) => {
@@ -514,11 +576,11 @@ export default function Dashboard({ products: productsProp, isDarkMode = true }:
           <div>
             <span className="text-[14px] text-white/90 font-medium leading-tight">Vendas Entregues</span>
             <h2 className="text-[32px] font-black text-white mt-1 leading-none">
-              {formatNumberHidden(currentPeriodData.orders)}
+              {showValues ? (adminMetricsOverride.total_vendas || currentPeriodData.orders) : '••••'}
             </h2>
           </div>
           <span className="text-[12px] text-white/70 relative z-10">
-            {currentPeriodData.changeOrders} vs. anterior ({currentPeriodData.status})
+            {adminMetricsOverride.var_total_vendas || currentPeriodData.changeOrders} vs. anterior ({currentPeriodData.status})
           </span>
         </div>
 
@@ -533,11 +595,11 @@ export default function Dashboard({ products: productsProp, isDarkMode = true }:
           <div>
             <span className="text-[14px] text-white/90 font-medium leading-tight">Receita no Período</span>
             <h2 className="text-[28px] md:text-[32px] font-black text-white mt-1 leading-none truncate">
-              {formatCurrency(currentPeriodData.sales)}
+              {showValues ? (adminMetricsOverride.receita_total ? (activeCurrency === 'BRL' ? `R$ ${adminMetricsOverride.receita_total}` : formatCurrency(parseSavedFloat('shopspy_admin_receita_total', 0))) : formatCurrency(currentPeriodData.sales)) : '••••'}
             </h2>
           </div>
           <span className="text-[12px] text-white/70 relative z-10">
-            {currentPeriodData.changeSales} vs. anterior ({currentPeriodData.status})
+            {adminMetricsOverride.var_receita_total || currentPeriodData.changeSales} vs. anterior ({currentPeriodData.status})
           </span>
         </div>
 
@@ -550,11 +612,11 @@ export default function Dashboard({ products: productsProp, isDarkMode = true }:
           <div>
             <span className="text-[14px] text-white/90 font-medium leading-tight">Vendas Pendentes</span>
             <h2 className="text-[32px] font-black text-white mt-1 leading-none">
-              {formatNumberHidden(Math.round(currentPeriodData.orders * 0.08))}
+              {showValues ? (adminMetricsOverride.vendas_pendentes || Math.round(currentPeriodData.orders * 0.08)) : '••••'}
             </h2>
           </div>
           <span className="text-[12px] text-white/70 relative z-10">
-            Aguardando pagamento ({currentPeriodData.status})
+            {adminMetricsOverride.var_vendas_pendentes || 'Aguardando pagamento'} ({currentPeriodData.status})
           </span>
         </div>
 
@@ -567,11 +629,11 @@ export default function Dashboard({ products: productsProp, isDarkMode = true }:
           <div>
             <span className="text-[14px] text-white/90 font-medium leading-tight">Vendas Canceladas</span>
             <h2 className="text-[32px] font-black text-white mt-1 leading-none">
-              {formatNumberHidden(Math.round(currentPeriodData.orders * 0.03))}
+              {showValues ? (adminMetricsOverride.vendas_falhadas || Math.round(currentPeriodData.orders * 0.03)) : '••••'}
             </h2>
           </div>
           <span className="text-[12px] text-white/70 relative z-10">
-            Não aprovadas ({currentPeriodData.status})
+            {adminMetricsOverride.var_vendas_falhadas || 'Não aprovadas'} ({currentPeriodData.status})
           </span>
         </div>
 
