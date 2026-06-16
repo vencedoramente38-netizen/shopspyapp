@@ -179,13 +179,18 @@ export default function Login({ onLogin, onBack }: LoginProps) {
         }
       });
 
-      if (signUpError) {
-        // Se já existe, tentamos apenas fazer o Login
-        if (signUpError.message.toLowerCase().includes('already registered') || signUpError.status === 400) {
-          console.log('Usuário já existe no Auth, tentando login direto...');
-        } else {
-          throw signUpError;
+      // 2. Tentar criar a conta via Edge Function (para garantir confirmação instantânea)
+      const { data: createData, error: createError } = await supabase.functions.invoke('create-user', {
+        body: { 
+          email: email.toLowerCase().trim(), 
+          password, 
+          name, 
+          plan: userData.plan 
         }
+      });
+
+      if (createError || createData?.error) {
+        throw new Error(createError?.message || createData?.error || 'Erro ao criar conta');
       }
 
       // 3. Fazer login
@@ -196,7 +201,7 @@ export default function Login({ onLogin, onBack }: LoginProps) {
 
       if (loginError) {
         if (loginError.message.toLowerCase().includes('invalid login credentials')) {
-          setErrorMsg('Este e-mail já possui uma conta ativa. Caso tenha esquecido sua senha, use a opção de recuperar senha.');
+          setErrorMsg('Erro ao autenticar. Verifique sua senha ou use a recuperação de senha.');
         } else {
           throw loginError;
         }
@@ -204,7 +209,7 @@ export default function Login({ onLogin, onBack }: LoginProps) {
         return;
       }
 
-      // 4. Sucesso! Vincular o ID do Auth com o registro na tabela users_shopspy
+      // 4. Vincular o ID do Auth com o registro na tabela users_shopspy
       const authUserId = loginData.user?.id;
       if (authUserId) {
         await supabase
@@ -223,19 +228,7 @@ export default function Login({ onLogin, onBack }: LoginProps) {
 
     } catch (err: any) {
       console.error('Erro no registro:', err);
-      
-      // Fallback local se o Supabase estiver offline (opcional)
-      const allowedEmails = ['usuarioshopspy765@gmail.com'];
-      if (allowedEmails.includes(email.toLowerCase().trim())) {
-        localStorage.setItem('shopspy_auth', 'true');
-        localStorage.setItem('shopspy_is_admin', 'false');
-        localStorage.setItem('shopspy_user_email', email.toLowerCase().trim());
-        localStorage.setItem('shopspy_plan', 'mensal');
-        localStorage.setItem('shopspy_notifications_enabled', 'false');
-        onLogin();
-      } else {
-        setErrorMsg(err.message || 'Erro ao processar sua conta. Tente novamente mais tarde.');
-      }
+      setErrorMsg(err.message || 'Erro ao processar sua conta. Tente novamente mais tarde.');
     }
 
     setIsLoading(false);
