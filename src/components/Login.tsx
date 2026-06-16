@@ -49,35 +49,45 @@ export default function Login({ onLogin, onBack }: LoginProps) {
       }
 
       // 2. Verificar se usuário está ativo na nossa tabela de vendas
-      // Primeiro tentamos pelo ID
+      console.log('Verificando usuário no DB para o ID:', data.user.id);
       let { data: userData, error: dbError } = await supabase
         .from('users_shopspy')
-        .select('is_active, plan, plan_expires_at')
+        .select('id, is_active, plan, plan_expires_at')
         .eq('id', data.user.id)
         .maybeSingle();
 
       // Se não achar por ID, tenta por e-mail (sincronização de leads/vendas)
       if (!userData && data.user.email) {
-        const { data: leadData } = await supabase
+        console.log('Usuário não encontrado por ID. Tentando por e-mail:', data.user.email);
+        const { data: leadData, error: leadError } = await supabase
           .from('users_shopspy')
-          .select('is_active, plan, plan_expires_at')
+          .select('id, is_active, plan, plan_expires_at')
           .eq('email', data.user.email.toLowerCase().trim())
           .maybeSingle();
         
         if (leadData) {
-          // Vincular o ID do Auth ao registro existente por e-mail
-          await supabase
+          console.log('Encontrado registro por e-mail. Sincronizando ID...');
+          const { error: syncError } = await supabase
             .from('users_shopspy')
             .update({ id: data.user.id })
             .eq('email', data.user.email.toLowerCase().trim());
           
-          userData = leadData;
-          dbError = null;
+          if (syncError) {
+            console.error('Erro ao sincronizar ID:', syncError.message);
+          } else {
+            userData = { ...leadData, id: data.user.id };
+            dbError = null;
+            console.log('Sincronização concluída com sucesso!');
+          }
+        } else if (leadError) {
+          console.error('Erro ao buscar por e-mail:', leadError.message);
+        } else {
+          console.log('Nenhum registro encontrado para este e-mail no sistema de vendas.');
         }
       }
 
       if (dbError || !userData) {
-        setErrorMsg('E-mail não encontrado no sistema de vendas. Se você trocou o e-mail na hora da compra, use o e-mail original para entrar.');
+        setErrorMsg('E-mail não encontrado no sistema de vendas. Se você comprou com outro e-mail, use-o para entrar.');
         await supabase.auth.signOut();
         setIsLoading(false);
         return;
