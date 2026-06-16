@@ -131,35 +131,29 @@ serve(async (req) => {
         .maybeSingle();
 
       if (!existingUser) {
-        // Criar usuário no Auth com senha temporária
-        const tempPassword = `temp_${Date.now()}_shopspy`;
-        const { data: newAuthUser, error: authError } = await supabase.auth.admin.createUser({
+        // Apenas inserir na tabela users_shopspy.
+        // O usuário fará o "Sign Up" no frontend para criar sua conta no Auth.
+        const { error: insertError } = await supabase.from('users_shopspy').insert({
           email,
-          password: tempPassword,
-          email_confirm: true,
-          user_metadata: { name, plan, needs_password_reset: true }
+          name,
+          plan,
+          plan_expires_at: expiresAt,
+          is_active: true,
+          transaction_id: transactionId,
+          customer_name: name
         });
-
-        const userId = newAuthUser?.user?.id;
-
-        if (userId) {
-          // Inserir na tabela liberando o email
-          await supabase.from('users_shopspy').insert({
-            id: userId,
-            email,
-            name,
-            plan,
-            plan_expires_at: expiresAt,
-            is_active: true,
-            transaction_id: transactionId,
-            customer_name: name
-          });
+        
+        if (insertError) {
+          console.error('Erro ao inserir em users_shopspy:', insertError);
+        } else {
+          console.log('Dados do usuário liberados para registro:', email);
         }
       } else {
         // Atualizar plano se já existir
         await supabase.from('users_shopspy')
           .update({ plan, plan_expires_at: expiresAt, is_active: true })
           .eq('email', email);
+        console.log('Plano de usuário atualizado:', email);
       }
     }
 

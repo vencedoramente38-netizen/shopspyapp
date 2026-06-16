@@ -144,16 +144,18 @@ export default function Login({ onLogin, onBack }: LoginProps) {
     }
 
     try {
-      // Verificar se email existe na tabela users_shopspy (foi liberado pelo webhook)
+      // 1. Verificar se email existe na tabela users_shopspy (foi liberado pelo webhook)
       const { data: userData, error: userError } = await supabase
         .from('users_shopspy')
         .select('id, email, is_active, plan')
         .eq('email', email.toLowerCase().trim())
         .maybeSingle();
 
+      if (userError) throw userError;
+
       if (!userData) {
         console.warn('Registro: e-mail não encontrado na tabela users_shopspy:', email);
-        setErrorMsg('E-mail não encontrado no sistema de vendas. Verifique se usou o mesmo e-mail da compra ou se o pagamento foi aprovado.');
+        setErrorMsg('E-mail não encontrado no sistema de vendas. Verifique se usou o mesmo e-mail da compra ou se o pagamento foi concluído.');
         setIsLoading(false);
         return;
       }
@@ -164,29 +166,45 @@ export default function Login({ onLogin, onBack }: LoginProps) {
         return;
       }
 
-      // Atualizar senha do usuário no Auth
-      const { error: updateError } = await supabase.auth.admin.updateUserById(
-        userData.id,
-        { password }
-      );
+      // 2. Tentar criar a conta (Sign Up)
+      // Se o usuário já foi criado pelo webhook no Auth, o signUp pode retornar erro de "User already registered"
+      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+        email: email.toLowerCase().trim(),
+        password,
+        options: {
+          data: {
+            name: name,
+            plan: userData.plan
+          }
+        }
+      });
 
-      if (updateError) {
-        // Tentar via signUp caso usuário não exista no Auth ainda
-        const { error: signUpError } = await supabase.auth.signUp({
-          email: email.toLowerCase().trim(),
-          password
-        });
-        if (signUpError) throw signUpError;
+      if (signUpError) {
+        // Se já existe, tentamos apenas fazer o Login
+        if (signUpError.message.toLowerCase().includes('already registered') || signUpError.status === 400) {
+          console.log('Usuário já existe no Auth, tentando login direto...');
+        } else {
+          throw signUpError;
+        }
       }
 
-      // Fazer login automaticamente após criar conta
+      // 3. Fazer login
       const { data: loginData, error: loginError } = await supabase.auth.signInWithPassword({
         email: email.toLowerCase().trim(),
         password
       });
 
-      if (loginError) throw loginError;
+      if (loginError) {
+        if (loginError.message.toLowerCase().includes('invalid login credentials')) {
+          setErrorMsg('Este e-mail já possui uma conta ativa. Caso tenha esquecido sua senha, use a opção de recuperar senha.');
+        } else {
+          throw loginError;
+        }
+        setIsLoading(false);
+        return;
+      }
 
+      // 4. Sucesso! Configurar sessão local
       localStorage.setItem('shopspy_auth', 'true');
       localStorage.setItem('shopspy_is_admin', 'false');
       localStorage.setItem('shopspy_user_email', email.toLowerCase().trim());
@@ -195,7 +213,9 @@ export default function Login({ onLogin, onBack }: LoginProps) {
       onLogin();
 
     } catch (err: any) {
-      // Fallback local — verificar se email está na lista liberada
+      console.error('Erro no registro:', err);
+      
+      // Fallback local se o Supabase estiver offline (opcional)
       const allowedEmails = ['usuarioshopspy765@gmail.com'];
       if (allowedEmails.includes(email.toLowerCase().trim())) {
         localStorage.setItem('shopspy_auth', 'true');
@@ -205,7 +225,7 @@ export default function Login({ onLogin, onBack }: LoginProps) {
         localStorage.setItem('shopspy_notifications_enabled', 'false');
         onLogin();
       } else {
-        setErrorMsg('E-mail não encontrado ou não autorizado. Use o e-mail da compra.');
+        setErrorMsg(err.message || 'Erro ao processar sua conta. Tente novamente mais tarde.');
       }
     }
 
