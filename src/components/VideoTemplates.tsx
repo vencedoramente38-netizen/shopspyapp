@@ -119,7 +119,7 @@ export default function VideoTemplates({ onNotification, selectedDefaultProduct 
   // State Management
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
   const [step, setStep] = useState<'selection' | 'config' | 'result'>('selection');
-  const [configStep, setConfigStep] = useState<1 | 2 | 3>(1);
+  const [configStep, setConfigStep] = useState<1 | 2 | 3 | 4>(1);
   const [loaderProgress, setLoaderProgress] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   
@@ -139,7 +139,6 @@ export default function VideoTemplates({ onNotification, selectedDefaultProduct 
 
   // New IA Speech States
   const [speechText, setSpeechText] = useState('');
-  const [generatedSpeech, setGeneratedSpeech] = useState('');
   const [isGeneratingSpeech, setIsGeneratingSpeech] = useState(false);
 
   // FAVORITOS + BUSCA logic
@@ -301,62 +300,27 @@ export default function VideoTemplates({ onNotification, selectedDefaultProduct 
 
   const downloadAvatarImage = async () => {
     if (!selectedAvatar) return;
-    const filename = `avatar_${selectedAvatar.nome.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.jpg`;
     try {
       setIsDownloadingAvatar(true);
       onNotification("Iniciando download do avatar...");
       
       const imageUrl = selectedAvatar.image;
+      const filename = `avatar_${selectedAvatar.nome.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.jpg`;
 
-      if (imageUrl.startsWith('data:')) {
-        const a = document.createElement('a');
-        a.href = imageUrl;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        onNotification("Imagem do avatar salva com sucesso! 📸");
-        return;
-      }
-
-      const response = await fetch(imageUrl);
+      const response = await fetch(imageUrl, { mode: 'cors' });
       const blob = await response.blob();
-      const blobUrl = URL.createObjectURL(blob);
+      const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
-      a.href = blobUrl;
+      a.href = url;
       a.download = filename;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
-      URL.revokeObjectURL(blobUrl);
-      onNotification("Imagem do avatar salva com sucesso! 📸");
-    } catch (err) {
-      console.warn("Direct blob download failed, trying CORS proxy fallback:", err);
-      try {
-        const proxyUrl = `https://corsproxy.io/?url=${encodeURIComponent(selectedAvatar.image)}`;
-        const response = await fetch(proxyUrl);
-        const blob = await response.blob();
-        const blobUrl = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = blobUrl;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(blobUrl);
-        onNotification("Imagem do avatar salva com sucesso! 📸");
-      } catch (proxyErr) {
-        console.warn("CORS proxy download failed too, using tab fallback:", proxyErr);
-        // Fallback
-        const a = document.createElement('a');
-        a.href = selectedAvatar.image;
-        a.target = '_blank';
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        onNotification("Download iniciado em aba adicional.");
-      }
+      URL.revokeObjectURL(url);
+      onNotification("Avatar salvo com sucesso! 📸");
+    } catch {
+      onNotification("Download alternativo iniciado em nova aba...");
+      window.open(selectedAvatar.image, '_blank');
     } finally {
       setIsDownloadingAvatar(false);
     }
@@ -399,48 +363,50 @@ export default function VideoTemplates({ onNotification, selectedDefaultProduct 
 - Product Category: "${shortCategory}" (Product Price: ${selectedProduct.preco})
 - Interaction: The model explicitly holds, rotates, and demonstrates the features of "${cleanProductName}" with great happiness and confidence, ensuring the product's details and label are readable and look pristine under the camera focus.`;
 
-    const copy = `🌟 NOVIDADE! 🌟\n\nConfira o(a) ${cleanProductName} que acaba de chegar! 🚀\n\n✅ Alta Qualidade\n✅ Design Moderno\n✅ Melhor Custo-Benefício\n\nGaranta o seu agora! 🛍️\n\n#Shopee #UGC #Criativo #Marketing #Vendas`;
+    const productDescription = `🌟 NOVIDADE! 🌟\n\nConfira o(a) ${cleanProductName} que acaba de chegar! 🚀\n\n✅ Alta Qualidade\n✅ Design Moderno\n✅ Melhor Custo-Benefício\n\nGaranta o seu agora! 🛍️\n\n#Shopee #UGC #Criativo #Marketing #Vendas`;
+
+    const mergePrompt = `You have two separate images that need to be merged into one seamless professional photo:
+
+IMAGE A: A product photo of "${cleanProductName}"
+IMAGE B: A full body photo of a person (${selectedAvatar?.genero || 'model'} named ${selectedAvatar?.nome || 'model'})
+
+MERGE TASK:
+Place the person from Image B naturally holding, wearing or interacting with the product from Image A.
+
+TECHNICAL INSTRUCTIONS:
+- Extract the person from Image B using precise masking
+- Extract the product from Image A
+- Composite them together in a natural pose
+- Match the lighting direction and color temperature of both images
+- Add realistic shadows under the product where the hands touch it
+- Blend edges smoothly — no harsh cutouts visible
+- Keep the background from Image B
+- The product must be sharp and clearly visible
+- Final result should look like one single professional photograph taken in the same moment
+
+QUALITY: Commercial photography standard, ready for social media advertising.
+OUTPUT FORMAT: Single JPG image, 9:16 aspect ratio.`;
 
     return {
       englishPrompt: engPrompt,
-      productDescription: copy,
-      mergePrompt: `High resolution RAW photo of "${cleanProductName}" held by a person, realistic hands, ${selectedScenario?.id === 'personalized' ? customScenarioText : selectedScenario?.description}, studio lighting, highly detailed, 8k --v 6.0`
+      productDescription: productDescription,
+      mergePrompt: mergePrompt
     };
   }, [selectedTemplate, selectedProduct, selectedAvatar, selectedScenario, customScenarioText]);
 
-  // Copy helper
   const handleCopyToClipboard = (text: string, label: string) => {
     navigator.clipboard.writeText(text);
     onNotification(`Copiado: ${label}!`);
   };
 
-  // AI Speech Generator Function (Manual Trigger)
-  const generateSpeechWithAI = async () => {
-    if (!selectedProduct || !selectedAvatar) {
-      onNotification("Selecione um produto e um avatar primeiro!");
+  const handleGenerateSpeech = () => {
+    if (!selectedProduct) {
+      onNotification("⚠️ Selecione um produto primeiro!");
       return;
     }
-
-    setIsGeneratingSpeech(true);
-    setGeneratedSpeech('');
-    
-    try {
-      // Simulate/Trigger AI Generation logic
-      const prompt = `Gere uma fala de venda de 15 segundos em primeira pessoa para o produto ${selectedProduct.nome}. O avatar chama-se ${selectedAvatar.nome}. Estilo natural, carismático e convincente.`;
-      
-      // We simulate the delay for a premium feel
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      const response = `Oi, gente! Eu sou a ${selectedAvatar.nome} e acabei de testar esse ${selectedProduct.nome}. Sério, a qualidade é incrível e o preço tá valendo muito a pena. Garanta o seu logo porque as unidades estão voando!`;
-      
-      setGeneratedSpeech(response);
-      setSpeechText(response);
-      onNotification("Fala gerada com IA com sucesso! ✨");
-    } catch (error) {
-      onNotification("Erro ao gerar fala. Tente novamente.");
-    } finally {
-      setIsGeneratingSpeech(false);
-    }
+    const speech = `Olha que fantástico esse ${selectedProduct.nome}! De ${selectedProduct.precoOriginal} por apenas ${selectedProduct.preco}! É a sua chance de garantir um item de ${selectedProduct.categoria} com qualidade Premium. Já são mais de ${selectedProduct.vendas} vendidos! Acesse agora pelo link!`;
+    setSpeechText(speech);
+    onNotification("Fala gerada com sucesso! ⚡");
   };
 
   // Start prompt generation process
@@ -1050,7 +1016,7 @@ export default function VideoTemplates({ onNotification, selectedDefaultProduct 
 
                       <div className="flex flex-col sm:flex-row gap-3">
                         <button
-                          onClick={generateSpeechWithAI}
+                          onClick={handleGenerateSpeech}
                           disabled={isGeneratingSpeech}
                           className="flex-1 bg-neutral-900 dark:bg-white text-white dark:text-black font-black py-3 px-6 rounded-xl transition-all duration-200 active:scale-[0.98] flex items-center justify-center gap-2 text-xs cursor-pointer disabled:opacity-50"
                         >
@@ -1125,7 +1091,7 @@ export default function VideoTemplates({ onNotification, selectedDefaultProduct 
 
             {/* Criativo Visual Card */}
             <div className="bg-white dark:bg-[#111111] border border-black/5 dark:border-white/[0.08] rounded-2xl p-5 shadow-lg flex flex-col sm:flex-row items-center gap-6">
-              <div className="w-[124px] h-[124px] rounded-xl overflow-hidden border border-black/5 dark:border-white/10 shadow-sm bg-neutral-100 dark:bg-white/5 flex-shrink-0 flex items-center justify-center">
+              <div className="w-[124px] h-[124px] rounded-xl overflow-hidden border border-black/10 dark:border-white/10 shadow-sm bg-neutral-100 dark:bg-white/5 flex-shrink-0 flex items-center justify-center">
                 <img 
                   src={selectedProduct.imagem} 
                   alt={selectedProduct.nome} 
@@ -1133,31 +1099,43 @@ export default function VideoTemplates({ onNotification, selectedDefaultProduct 
                   referrerPolicy="no-referrer"
                 />
               </div>
-              <div className="flex-1 space-y-4 w-full">
+              <div className="flex-1 space-y-3 w-full text-center sm:text-left">
                 <div>
-                  <span className="text-[9px] font-black tracking-[0.1em] bg-blue-600/10 text-blue-500 px-2 py-1 rounded uppercase">
-                    Criativo Visual
-                  </span>
-                  <h3 className="text-xs font-bold text-gray-900 dark:text-white mt-2 leading-tight">
+                  <h3 className="text-sm font-black text-gray-900 dark:text-white leading-tight">
                     {selectedProduct.nome}
                   </h3>
-                  <p className="text-[10px] text-gray-500 dark:text-white/40 mt-1 leading-none font-semibold">
-                    {selectedProduct.categoria} · {selectedProduct.preco}
-                  </p>
+                  <div className="flex items-center justify-center sm:justify-start gap-2.5 mt-1.5 font-bold uppercase tracking-wider">
+                    <span className="text-[11px] text-[#D0011B]">{selectedProduct.preco}</span>
+                    <div className="w-1 h-1 rounded-full bg-gray-300 dark:bg-white/10" />
+                    <span className="text-[11px] text-emerald-500">{selectedProduct.comissao} de comissão</span>
+                  </div>
                 </div>
                 
-                <button
-                  onClick={downloadProductImage}
-                  disabled={isDownloadingImage}
-                  className="w-full sm:w-auto bg-[#D0011B] hover:bg-[#D0011B]/95 disabled:opacity-50 text-white font-bold py-2.5 px-6 rounded-full transition-all duration-200 active:scale-[0.98] flex items-center justify-center gap-2 text-xs shadow-lg shadow-[#D0011B]/20 cursor-pointer"
-                >
-                  {isDownloadingImage ? (
-                    <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  ) : (
-                    <Download size={13} />
-                  )}
-                  <span>{isDownloadingImage ? 'Baixando...' : 'Baixar Imagem'}</span>
-                </button>
+                <div className="flex flex-col sm:flex-row items-center gap-2">
+                  <button
+                    onClick={downloadProductImage}
+                    disabled={isDownloadingImage}
+                    className="w-full sm:w-auto bg-[#D0011B] hover:bg-[#D0011B]/95 disabled:opacity-50 text-white font-black py-2.5 px-6 rounded-full transition-all duration-200 active:scale-[0.98] flex items-center justify-center gap-2 text-[11px] shadow-lg shadow-[#D0011B]/20 cursor-pointer uppercase tracking-wider"
+                  >
+                    {isDownloadingImage ? (
+                      <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    ) : (
+                      <Download size={13} />
+                    )}
+                    <span>{isDownloadingImage ? 'Baixando...' : 'Baixar Imagem'}</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      const textToCopy = `${selectedProduct.nome} - ${selectedProduct.preco} - ${selectedProduct.comissao} de comissão`;
+                      navigator.clipboard.writeText(textToCopy);
+                      onNotification("Informações copiadas! 📋");
+                    }}
+                    className="w-full sm:w-auto bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 text-gray-700 dark:text-white font-black py-2.5 px-6 rounded-full transition-all duration-200 active:scale-[0.98] flex items-center justify-center gap-2 text-[11px] cursor-pointer uppercase tracking-wider"
+                  >
+                    <Copy size={13} />
+                    <span>Copiar Info</span>
+                  </button>
+                </div>
               </div>
             </div>
 

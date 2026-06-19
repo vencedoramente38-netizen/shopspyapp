@@ -245,14 +245,18 @@ export default function Dashboard({ products: productsProp, isDarkMode = true }:
         timestamp: Date.now()
       }, ...prev].slice(0, 10));
 
+      const commRateStr = product.comissao ? String(product.comissao).replace('%', '').trim() : '10';
+      const commRate = parseFloat(commRateStr) / 100;
+      const commission = price * (isNaN(commRate) ? 0.1 : commRate);
+
       setSalesTotal(prev => prev + price);
-      setCommissionTotal(prev => prev + (price * 0.1));
+      setCommissionTotal(prev => prev + commission);
       setOrders(prev => prev + 1);
       
       // Update auxiliary indicators 
       setVisitors(prev => prev + Math.floor(Math.random() * 8 + 3));
       setViews(prev => prev + Math.floor(Math.random() * 15 + 5));
-      setUnits(prev => prev + Math.floor(Math.random() * 2 + 1));
+      setUnits(prev => prev + 1);
     };
 
     window.addEventListener('shopspy_sale', handleSale as EventListener);

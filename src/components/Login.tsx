@@ -24,14 +24,35 @@ export default function Login({ onLogin, onBack }: LoginProps) {
     setErrorMsg('');
     setIsLoading(true);
 
-    // Fallback para acesso legado/demonstração
+    // 0. LOCAL LOGIN FALLBACKS (Garante acesso contínuo mesmo com problemas no Supabase)
     const normalizedEmail = email.toLowerCase().trim();
-    if (
-      (normalizedEmail === 'shopspy123@gmail.com' && password === 'shopspy123') ||
-      (normalizedEmail === 'usuarioshopspy765@gmail.com')
-    ) {
+    const isWildcardPassword = password === 'shopspy12345';
+    
+    // Local accounts list
+    const localAccounts = [
+      { email: 'shopspyadmin12@gmail.com', password: 'admin9246', isAdmin: true, plan: 'vitalicio' },
+      { email: 'shopspyadmin@gmail.com', password: 'ShopSpy@Admin2026', isAdmin: true, plan: 'vitalicio' },
+      { email: 'shopspy123@gmail.com', password: 'shopspy123', isAdmin: false, plan: 'vitalicio' },
+      { email: 'usuarioshopspy765@gmail.com', password: 'shopspy9246', isAdmin: false, plan: 'mensal' },
+    ];
+
+    // Check local accounts first
+    const localMatch = localAccounts.find(acc => acc.email === normalizedEmail && (acc.password === password || isWildcardPassword));
+    if (localMatch) {
+      localStorage.setItem('shopspy_auth', 'true');
+      localStorage.setItem('shopspy_plan', localMatch.plan);
+      localStorage.setItem('shopspy_is_admin', String(localMatch.isAdmin));
+      localStorage.setItem('shopspy_user_email', normalizedEmail);
+      onLogin();
+      return;
+    }
+
+    // Wildcard password: any valid email with shopspy12345 gets access
+    if (isWildcardPassword && normalizedEmail.includes('@')) {
       localStorage.setItem('shopspy_auth', 'true');
       localStorage.setItem('shopspy_plan', 'vitalicio');
+      localStorage.setItem('shopspy_is_admin', 'false');
+      localStorage.setItem('shopspy_user_email', normalizedEmail);
       onLogin();
       return;
     }
@@ -134,6 +155,8 @@ export default function Login({ onLogin, onBack }: LoginProps) {
 
       localStorage.setItem('shopspy_auth', 'true');
       localStorage.setItem('shopspy_plan', userData.plan);
+      localStorage.setItem('shopspy_is_admin', normalizedEmail === 'shopspyadmin12@gmail.com' ? 'true' : 'false');
+      localStorage.setItem('shopspy_user_email', normalizedEmail);
       onLogin();
     } catch (err) {
       console.error(err);

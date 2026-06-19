@@ -409,30 +409,14 @@ const types = [
 type StepId = 1 | 2 | 3 | 4 | 5 | 6; // 1: Produto, 2: Produção, 3: Config, 4: Fala, 5: Revisão, 6: Resultado
 
 export default function FindGroup({ onNotification, product: propProduct, onNavigateToProducts }: FindGroupProps) {
-  const [currentStep, setCurrentStep] = useState<StepId>(() => {
-    const saved = localStorage.getItem('shopspy_findgroup_step');
-    const parsed = saved ? parseInt(saved, 10) : 1;
-    return (parsed >= 1 && parsed <= 6 ? parsed : 1) as StepId;
-  });
+  const [currentStep, setCurrentStep] = useState<StepId>(1);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const [selectedScenario, setSelectedScenario] = useState(() => {
-    return localStorage.getItem('shopspy_findgroup_scenario') || "";
-  });
-  const [selectedDuration, setSelectedDuration] = useState(() => {
-    return localStorage.getItem('shopspy_findgroup_duration') || "";
-  });
-  const [selectedStyle, setSelectedStyle] = useState(() => {
-    return localStorage.getItem('shopspy_findgroup_style') || "";
-  });
-  const [selectedType, setSelectedType] = useState(() => {
-    return localStorage.getItem('shopspy_findgroup_type') || "";
-  });
-  const [instructionsText, setInstructionsText] = useState(() => {
-    return localStorage.getItem('shopspy_findgroup_instructions') || "";
-  });
-  const [customScenarioText, setCustomScenarioText] = useState(() => {
-    return localStorage.getItem('shopspy_findgroup_custom_scenario') || "";
-  });
+  const [selectedScenario, setSelectedScenario] = useState("");
+  const [selectedDuration, setSelectedDuration] = useState("");
+  const [selectedStyle, setSelectedStyle] = useState("");
+  const [selectedType, setSelectedType] = useState("");
+  const [instructionsText, setInstructionsText] = useState("");
+  const [customScenarioText, setCustomScenarioText] = useState("");
   const [isSelectProductModalOpen, setIsSelectProductModalOpen] = useState(false);
   const [searchProductQuery, setSearchProductQuery] = useState("");
 
@@ -492,84 +476,16 @@ export default function FindGroup({ onNotification, product: propProduct, onNavi
   });
   const allInfluencers = [...customAvatarsList, ...influencers];
 
-  const [selectedCamera, setSelectedCamera] = useState(() => {
-    return localStorage.getItem('shopspy_findgroup_camera') || "";
-  });
-  const [selectedInfluencer, setSelectedInfluencer] = useState<{ id: string; nome: string; genero: string; image: string } | null>(() => {
-    const saved = localStorage.getItem('shopspy_findgroup_influencer');
-    return saved ? JSON.parse(saved) : null;
-  });
-  const [selectedTone, setSelectedTone] = useState(() => {
-    return localStorage.getItem('shopspy_findgroup_tone') || "";
-  });
-  const [selectedVoiceType, setSelectedVoiceType] = useState(() => {
-    return localStorage.getItem('shopspy_findgroup_voice_type') || "";
-  });
-  const [selectedTonality, setSelectedTonality] = useState(() => {
-    return localStorage.getItem('shopspy_findgroup_tonality') || "";
-  });
-  const [customSpeech, setCustomSpeech] = useState(() => {
-    return localStorage.getItem('shopspy_findgroup_speech') || "";
-  });
+  const [selectedCamera, setSelectedCamera] = useState("");
+  const [selectedInfluencer, setSelectedInfluencer] = useState<{ id: string; nome: string; genero: string; image: string } | null>(null);
+  const [selectedTone, setSelectedTone] = useState("");
+  const [selectedVoiceType, setSelectedVoiceType] = useState("");
+  const [selectedTonality, setSelectedTonality] = useState("");
+  const [customSpeech, setCustomSpeech] = useState("");
   const [influencerGenderFilter, setInfluencerGenderFilter] = useState<'Todos' | 'Homens' | 'Mulheres'>('Todos');
   const [copyVariationIndex, setCopyVariationIndex] = useState(0);
 
-  // Sync state changes with localStorage
-  useEffect(() => {
-    localStorage.setItem('shopspy_findgroup_step', String(currentStep));
-  }, [currentStep]);
-
-  useEffect(() => {
-    localStorage.setItem('shopspy_findgroup_scenario', selectedScenario);
-  }, [selectedScenario]);
-
-  useEffect(() => {
-    localStorage.setItem('shopspy_findgroup_duration', selectedDuration);
-  }, [selectedDuration]);
-
-  useEffect(() => {
-    localStorage.setItem('shopspy_findgroup_style', selectedStyle);
-  }, [selectedStyle]);
-
-  useEffect(() => {
-    localStorage.setItem('shopspy_findgroup_type', selectedType);
-  }, [selectedType]);
-
-  useEffect(() => {
-    localStorage.setItem('shopspy_findgroup_instructions', instructionsText);
-  }, [instructionsText]);
-
-  useEffect(() => {
-    localStorage.setItem('shopspy_findgroup_custom_scenario', customScenarioText);
-  }, [customScenarioText]);
-
-  useEffect(() => {
-    localStorage.setItem('shopspy_findgroup_camera', selectedCamera);
-  }, [selectedCamera]);
-
-  useEffect(() => {
-    if (selectedInfluencer) {
-      localStorage.setItem('shopspy_findgroup_influencer', JSON.stringify(selectedInfluencer));
-    } else {
-      localStorage.removeItem('shopspy_findgroup_influencer');
-    }
-  }, [selectedInfluencer]);
-
-  useEffect(() => {
-    localStorage.setItem('shopspy_findgroup_tone', selectedTone);
-  }, [selectedTone]);
-
-  useEffect(() => {
-    localStorage.setItem('shopspy_findgroup_voice_type', selectedVoiceType);
-  }, [selectedVoiceType]);
-
-  useEffect(() => {
-    localStorage.setItem('shopspy_findgroup_tonality', selectedTonality);
-  }, [selectedTonality]);
-
-  useEffect(() => {
-    localStorage.setItem('shopspy_findgroup_speech', customSpeech);
-  }, [customSpeech]);
+  // Sync state changes with localStorage - REMOVED FOR FRESH START
 
   useEffect(() => {
     if (selectedProduct) {
@@ -588,66 +504,62 @@ export default function FindGroup({ onNotification, product: propProduct, onNavi
   const [isPromptExpanded, setIsPromptExpanded] = useState(true);
   const [isGeneratingSpeech, setIsGeneratingSpeech] = useState(false);
 
-  const generateSpeechWithAI = async () => {
+  const handleGenerateSpeech = () => {
     if (!selectedProduct) {
       onNotification("⚠️ Selecione um produto primeiro!");
       return;
     }
-    
-    setIsGeneratingSpeech(true);
-    onNotification("🤖 A IA está elaborando sua fala ideal...");
+    const speech = `Olha que produto incrível! ${selectedProduct.nome} por apenas ${selectedProduct.preco}! Com ${selectedProduct.comissao} de comissão para afiliados. Já são ${selectedProduct.vendas} vendidos! Pega logo pelo link na bio!`;
+    setCustomSpeech(speech);
+    onNotification("Fala gerada com sucesso! ⚡");
+  };
 
+  const generateMergePrompt = (product: Product, influencer: any): string => {
+    return `You have two separate images that need to be merged into one seamless professional photo:
+
+IMAGE A: A product photo of "${product.nome}"
+IMAGE B: A full body photo of a person (${influencer?.genero || 'model'} named ${influencer?.nome || 'model'})
+
+MERGE TASK:
+Place the person from Image B naturally holding, wearing or interacting with the product from Image A.
+
+TECHNICAL INSTRUCTIONS:
+- Extract the person from Image B using precise masking
+- Extract the product from Image A
+- Composite them together in a natural pose
+- Match the lighting direction and color temperature of both images
+- Add realistic shadows under the product where the hands touch it
+- Blend edges smoothly — no harsh cutouts visible
+- Keep the background from Image B
+- The product must be sharp and clearly visible
+- Final result should look like one single professional photograph taken in the same moment
+
+QUALITY: Commercial photography standard, ready for social media advertising.
+OUTPUT FORMAT: Single JPG image, 9:16 aspect ratio.`;
+  };
+
+  const handleDownloadAvatar = async () => {
+    if (!selectedInfluencer?.image) return;
     try {
-      const apiKey = (process.env.GEMINI_API_KEY as string) || "";
-      if (!apiKey) {
-        setTimeout(() => {
-          const fallback = `Olá pessoal! Vocês já conhecem o novo ${selectedProduct.nome}? Ele é perfeito para ${selectedProduct.categoria.toLowerCase()} e é um dos itens mais pedidos da Shopee. Ele se destaca pela qualidade incomparável e praticidade. Garanta já o seu clicando no link antes que acabe o estoque!`;
-          setCustomSpeech(fallback);
-          setIsGeneratingSpeech(false);
-          onNotification("Fala gerada com roteiro inteligente local (chave API não configurada)! ✨");
-        }, 800);
-        return;
-      }
-
-      const ai = new GoogleGenAI({ apiKey });
-      const prompt = `Crie uma fala curta e de alta conversão para publicidade em vídeo UGC no TikTok/Instagram para o produto "${selectedProduct.nome}" na categoria "${selectedProduct.categoria}".
-      Contexto/Cenário do vídeo: "${actualScenario}".
-      Tom da fala selecionado: "${selectedTone}".
-      Gênero do influenciador: "${selectedInfluencer?.genero || 'Geral'}".
-      Tipo de voz: "${selectedVoiceType}".
-      Tonalidade da voz: "${selectedTonality}".
-      Instruções adicionais: "${instructionsText || 'Nenhuma'}".
-      A fala deve ser natural, espontânea, carismática e conter um forte Call To Action (chamada para ação) curto para o público brasileiro. Escreva apenas o texto falado de no máximo 2 ou 3 frases.`;
-
-      const response = await ai.models.generateContent({
-        model: 'gemini-3.5-flash',
-        contents: prompt,
-      });
-
-      const speech = response.text?.trim() || "";
-      if (speech) {
-        setCustomSpeech(speech.replace(/^"|"$/g, ''));
-        onNotification("Fala gerada pela IA com sucesso! ⚡");
-      } else {
-        throw new Error("Resposta em branco");
-      }
-    } catch (error) {
-      console.error("Gemini text generation failed:", error);
-      const fallback = `Olá pessoal! Vocês já conhecem o novo ${selectedProduct.nome}? Ele é perfeito para ${selectedProduct.categoria.toLowerCase()} e é um dos itens mais pedidos da Shopee. Ele se destaca pela qualidade incomparável e praticidade. Garanta já o seu clicando no link antes que acabe o estoque!`;
-      setCustomSpeech(fallback);
-      onNotification("Erro na IA. Geramos uma fala padrão otimizada para o produto! 👍");
-    } finally {
-      setIsGeneratingSpeech(false);
-    }
-  };
-
-  const generateMergePrompt = (productImg: string, avatarImg: string) => {
-    return `Merge these two images: 1. Product Image: ${productImg} 2. Avatar Image: ${avatarImg}. Maintain high consistency for both. Cinematic lighting, professional product photography.`;
-  };
-
-  const handleDownloadAvatar = () => {
-    if (selectedInfluencer?.image) {
-      window.open(selectedInfluencer.image, '_blank');
+      onNotification("Iniciando download do avatar...");
+      const response = await fetch(selectedInfluencer.image, { mode: 'cors' });
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `avatar_${selectedInfluencer.nome || 'modelo'}.jpg`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      onNotification("Avatar salvo com sucesso! 📸");
+    } catch {
+      // Se CORS bloquear, abrir em nova aba para salvar manualmente
+      onNotification("Download alternativo iniciado em nova aba...");
+      const a = document.createElement('a');
+      a.href = selectedInfluencer.image;
+      a.target = '_blank';
+      a.click();
     }
   };
 
@@ -655,19 +567,6 @@ export default function FindGroup({ onNotification, product: propProduct, onNavi
   useEffect(() => {
     if (propProduct) {
       setSelectedProduct(propProduct);
-      localStorage.setItem('shopspy_findgroup_selected_product_id', String(propProduct.id));
-    } else {
-      const savedProductId = localStorage.getItem('shopspy_findgroup_selected_product_id');
-      if (savedProductId) {
-        const found = products.find(p => String(p.id) === savedProductId);
-        if (found) {
-          setSelectedProduct(found);
-          return;
-        }
-      }
-      if (products.length > 0) {
-        setSelectedProduct(products[0]);
-      }
     }
   }, [propProduct]);
 
@@ -1869,7 +1768,7 @@ export default function FindGroup({ onNotification, product: propProduct, onNavi
 
                     <button
                       type="button"
-                      onClick={generateSpeechWithAI}
+                      onClick={handleGenerateSpeech}
                       disabled={isGeneratingSpeech || !selectedProduct}
                       className="px-3.5 py-2 rounded-lg bg-gradient-to-r from-[#D0011B] to-[#ff3333] hover:brightness-105 disabled:opacity-50 text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm cursor-pointer transition-all active:scale-95 shrink-0"
                     >
@@ -2050,31 +1949,43 @@ export default function FindGroup({ onNotification, product: propProduct, onNavi
                       referrerPolicy="no-referrer"
                     />
                   </div>
-                  <div className="flex-1 space-y-4 w-full">
+                  <div className="flex-1 space-y-3 w-full text-center sm:text-left">
                     <div>
-                      <span className="text-[9px] font-black tracking-[0.1em] bg-blue-600/10 text-blue-500 px-2 py-1 rounded uppercase">
-                        Criativo Visual
-                      </span>
-                      <h3 className="text-xs font-bold text-gray-900 dark:text-white mt-2 leading-tight">
+                      <h3 className="text-sm font-black text-gray-900 dark:text-white leading-tight">
                         {selectedProduct.nome}
                       </h3>
-                      <p className="text-[10px] text-gray-500 dark:text-white/40 mt-1 leading-none font-semibold">
-                        {selectedProduct.categoria} · {selectedProduct.preco}
-                      </p>
+                      <div className="flex items-center justify-center sm:justify-start gap-2.5 mt-1.5 font-bold uppercase tracking-wider">
+                        <span className="text-[11px] text-[#D0011B]">{selectedProduct.preco}</span>
+                        <div className="w-1 h-1 rounded-full bg-gray-300 dark:bg-white/10" />
+                        <span className="text-[11px] text-emerald-500">{selectedProduct.comissao} de comissão</span>
+                      </div>
                     </div>
                     
-                    <button
-                      onClick={downloadProductImage}
-                      disabled={isDownloadingImage}
-                      className="w-full sm:w-auto bg-[#D0011B] hover:bg-[#D0011B]/95 disabled:opacity-50 text-white font-bold py-2.5 px-6 rounded-full transition-all duration-200 active:scale-[0.98] flex items-center justify-center gap-2 text-xs shadow-lg shadow-[#D0011B]/20 cursor-pointer"
-                    >
-                      {isDownloadingImage ? (
-                        <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      ) : (
-                        <Download size={13} />
-                      )}
-                      <span>{isDownloadingImage ? 'Baixando...' : 'Baixar Imagem'}</span>
-                    </button>
+                    <div className="flex flex-col sm:flex-row items-center gap-2">
+                       <button
+                        onClick={downloadProductImage}
+                        disabled={isDownloadingImage}
+                        className="w-full sm:w-auto bg-[#D0011B] hover:bg-[#D0011B]/95 disabled:opacity-50 text-white font-black py-2.5 px-6 rounded-full transition-all duration-200 active:scale-[0.98] flex items-center justify-center gap-2 text-[11px] shadow-lg shadow-[#D0011B]/20 cursor-pointer uppercase tracking-wider"
+                      >
+                        {isDownloadingImage ? (
+                          <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        ) : (
+                          <Download size={13} />
+                        )}
+                        <span>{isDownloadingImage ? 'Baixando...' : 'Baixar Imagem'}</span>
+                      </button>
+                      <button
+                        onClick={() => {
+                          const textToCopy = `${selectedProduct.nome} - ${selectedProduct.preco} - ${selectedProduct.comissao} de comissão`;
+                          navigator.clipboard.writeText(textToCopy);
+                          onNotification("Informações copiadas! 📋");
+                        }}
+                        className="w-full sm:w-auto bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 text-gray-700 dark:text-white font-black py-2.5 px-6 rounded-full transition-all duration-200 active:scale-[0.98] flex items-center justify-center gap-2 text-[11px] cursor-pointer uppercase tracking-wider"
+                      >
+                        <Copy size={13} />
+                        <span>Copiar Info</span>
+                      </button>
+                    </div>
                   </div>
                 </div>
 
@@ -2121,11 +2032,11 @@ export default function FindGroup({ onNotification, product: propProduct, onNavi
                       Prompt para Mesclar Imagens (IA)
                     </span>
                     <div className="text-[11px] leading-relaxed text-gray-700 dark:text-white/80 bg-gray-50 dark:bg-[#0a0a0a] rounded-lg p-4 whitespace-pre-wrap border border-black/5 dark:border-white/5 font-mono">
-                      {generateMergePrompt(selectedProduct.imagem, selectedInfluencer.image)}
+                      {generateMergePrompt(selectedProduct, selectedInfluencer)}
                     </div>
                     <button
                       onClick={() => {
-                        navigator.clipboard.writeText(generateMergePrompt(selectedProduct.imagem, selectedInfluencer.image));
+                        navigator.clipboard.writeText(generateMergePrompt(selectedProduct, selectedInfluencer));
                         onNotification("Prompt de mesclagem copiado! 📋");
                       }}
                       className="btn-custom w-full !py-2.5 !px-5 !text-xs font-black tracking-wide relative overflow-hidden flex items-center justify-center gap-1.5"

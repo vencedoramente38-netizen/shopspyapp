@@ -614,7 +614,7 @@ export default function LandingPage({ onEnterLogin }: LandingPageProps) {
           borderColor: scrolled ? "rgba(208, 1, 27, 0.22)" : "rgba(0, 0, 0, 0.05)",
           boxShadow: scrolled
             ? "0 1px 40px rgba(208,1,27,0.06), 0 1px 0 rgba(0,0,0,0.06)"
-            : "0 8px 30px rgba(0, 0, 0, 0.02)",
+            : "0 1px 40px rgba(208,1,27,0.06), 0 1px 0 rgba(0,0,0,0.06)",
         }}
         transition={{
           type: "spring",
@@ -699,7 +699,7 @@ export default function LandingPage({ onEnterLogin }: LandingPageProps) {
       <header id="inicio" className="relative pt-[160px] pb-20 px-6 max-w-[1000px] mx-auto text-center bg-white overflow-hidden">
         {/* Soft background ambient radial gradient color */}
         <div 
-          className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px] -z-10 rounded-full" 
+          className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px] -z-10 rounded-full select-none pointer-events-none" 
           style={{ background: 'radial-gradient(ellipse 80% 60% at 50% -10%, rgba(208,1,27,0.08) 0%, transparent 70%)' }}
         />
 
