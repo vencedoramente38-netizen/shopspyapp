@@ -13,7 +13,6 @@ import Login from './components/Login';
 import LandingPage from './components/LandingPage';
 import ReferralPage from './components/ReferralPage';
 import AdminPanel from './components/AdminPanel';
-import Aulas from './components/Aulas';
 import VideoTemplates from './components/VideoTemplates';
 import InstallModal from './components/InstallModal';
 import { products as initialProducts } from './data/products';
@@ -85,8 +84,6 @@ export default function App() {
         return { title: 'Nova Estrutura', icon: <Plus className="text-white" size={24} /> };
       case 'indique-e-ganhe':
         return { title: 'Indique e Ganhe', icon: <Gift className="text-white" size={24} /> };
-      case 'aulas':
-        return { title: 'Aulas', icon: <PlayCircle className="text-white" size={24} /> };
       case 'metricas':
         return { title: 'Métricas', icon: <BarChart2 className="text-white" size={24} /> };
       case 'mineracao':
@@ -392,16 +389,6 @@ export default function App() {
                 className="flex flex-col flex-1"
               >
                 <Dashboard products={products} isDarkMode={isDarkMode} />
-              </motion.div>
-            ) : activeView === 'aulas' ? (
-              <motion.div
-                key="aulas"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="flex flex-col flex-1"
-              >
-                <Aulas />
               </motion.div>
             ) : activeView === 'templates-video' ? (
               <motion.div

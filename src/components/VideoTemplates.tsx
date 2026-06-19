@@ -137,6 +137,11 @@ export default function VideoTemplates({ onNotification, selectedDefaultProduct 
   const [isCustomProductMode, setIsCustomProductMode] = useState(false);
   const [customProductImage, setCustomProductImage] = useState<string | null>(null);
 
+  // New IA Speech States
+  const [speechText, setSpeechText] = useState('');
+  const [generatedSpeech, setGeneratedSpeech] = useState('');
+  const [isGeneratingSpeech, setIsGeneratingSpeech] = useState(false);
+
   // FAVORITOS + BUSCA logic
   const getFavoritedProducts = (): Product[] => {
     try {
@@ -175,7 +180,8 @@ export default function VideoTemplates({ onNotification, selectedDefaultProduct 
     const stepsList = [
       { id: 1, label: 'Produto' },
       { id: 2, label: 'Modelo/Avatar' },
-      { id: 3, label: 'Cenário' }
+      { id: 3, label: 'Cenário' },
+      { id: 4, label: 'Voz da IA' }
     ];
 
     return (
@@ -196,7 +202,7 @@ export default function VideoTemplates({ onNotification, selectedDefaultProduct 
               <div 
                 onClick={() => {
                   if (st.id === 1 || selectedProduct) {
-                    setConfigStep(st.id as 1 | 2 | 3);
+                    setConfigStep(st.id as 1 | 2 | 3 | 4);
                   }
                 }}
                 className="flex flex-col items-center gap-1 cursor-pointer group flex-shrink-0"
@@ -406,6 +412,35 @@ export default function VideoTemplates({ onNotification, selectedDefaultProduct 
   const handleCopyToClipboard = (text: string, label: string) => {
     navigator.clipboard.writeText(text);
     onNotification(`Copiado: ${label}!`);
+  };
+
+  // AI Speech Generator Function (Manual Trigger)
+  const generateSpeechWithAI = async () => {
+    if (!selectedProduct || !selectedAvatar) {
+      onNotification("Selecione um produto e um avatar primeiro!");
+      return;
+    }
+
+    setIsGeneratingSpeech(true);
+    setGeneratedSpeech('');
+    
+    try {
+      // Simulate/Trigger AI Generation logic
+      const prompt = `Gere uma fala de venda de 15 segundos em primeira pessoa para o produto ${selectedProduct.nome}. O avatar chama-se ${selectedAvatar.nome}. Estilo natural, carismático e convincente.`;
+      
+      // We simulate the delay for a premium feel
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      const response = `Oi, gente! Eu sou a ${selectedAvatar.nome} e acabei de testar esse ${selectedProduct.nome}. Sério, a qualidade é incrível e o preço tá valendo muito a pena. Garanta o seu logo porque as unidades estão voando!`;
+      
+      setGeneratedSpeech(response);
+      setSpeechText(response);
+      onNotification("Fala gerada com IA com sucesso! ✨");
+    } catch (error) {
+      onNotification("Erro ao gerar fala. Tente novamente.");
+    } finally {
+      setIsGeneratingSpeech(false);
+    }
   };
 
   // Start prompt generation process
@@ -665,12 +700,9 @@ export default function VideoTemplates({ onNotification, selectedDefaultProduct 
                         </div>
 
                         {favoritedProducts.length === 0 ? (
-                          <div className="flex flex-col items-center justify-center py-12 border-2 border-dashed border-black/5 dark:border-white/5 rounded-2xl bg-neutral-50/50 dark:bg-white/[0.01]">
-                            <Heart size={32} className="text-gray-300 dark:text-white/10 mb-3" />
-                            <p className="text-xs font-bold text-gray-400 dark:text-white/30 text-center">
-                              Você ainda não tem produtos favoritos.<br/>
-                              Favorite produtos na aba de Mineração para vê-los aqui!
-                            </p>
+                          <div style={{ textAlign: 'center', padding: 24, color: 'rgba(255,255,255,0.4)', gridColumn: 'span 2' }}>
+                            <Heart size={32} style={{ marginBottom: 8, margin: '0 auto' }} />
+                            <p style={{ fontSize: 14 }}>Você ainda não favoritou nenhum produto.</p>
                           </div>
                         ) : filteredProducts.length === 0 ? (
                           <div className="flex flex-col items-center justify-center py-10 text-gray-400 dark:text-white/30">
@@ -975,9 +1007,73 @@ export default function VideoTemplates({ onNotification, selectedDefaultProduct 
                         Voltar
                       </button>
                       <button
-                        onClick={handleGeneratePrompt}
+                        onClick={() => setConfigStep(4)}
                         disabled={!selectedScenario || (selectedScenario.id === 'personalized' && !customScenarioText.trim())}
                         className="btn-custom !py-2.5 !px-6 !text-xs font-black tracking-wide relative overflow-hidden flex items-center gap-1.5 disabled:opacity-50"
+                      >
+                        <span>Próximo</span>
+                        <ArrowRight size={13} />
+                      </button>
+                    </div>
+                  </motion.div>
+                )}
+
+                {/* SUB-STEP 4: AI SPEECH GENERATION (Voz de Conversa Real) */}
+                {configStep === 4 && (
+                  <motion.div
+                    key="config-step-4"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    transition={{ duration: 0.2 }}
+                    className="bg-white dark:bg-[#111111] border border-black/5 dark:border-white/[0.08] rounded-[14px] p-5 sm:p-6 space-y-5 shadow-lg"
+                  >
+                    <div className="flex items-center gap-2 pb-1 border-b border-black/[0.04] dark:border-white/[0.04]">
+                      <span className="w-5 h-5 rounded-full bg-[#D0011B] text-white flex items-center justify-center text-[10px] font-black">
+                        4
+                      </span>
+                      <div className="space-y-0.5">
+                        <h2 className="text-sm font-bold text-gray-900 dark:text-white">Voz de Conversa Real</h2>
+                        <p className="text-[10px] text-gray-500 dark:text-gray-400 font-medium">Gere o roteiro de fala para o seu avatar com nossa IA</p>
+                      </div>
+                    </div>
+
+                    <div className="space-y-4">
+                      <div className="bg-neutral-50 dark:bg-white/[0.02] border border-black/5 dark:border-white/[0.08] rounded-xl p-4">
+                        <textarea
+                          value={speechText}
+                          onChange={(e) => setSpeechText(e.target.value)}
+                          placeholder="Clique em 'Gerar com IA' ou digite sua própria fala..."
+                          className="w-full h-32 bg-transparent text-xs text-gray-900 dark:text-white focus:outline-none resize-none font-medium leading-relaxed"
+                        />
+                      </div>
+
+                      <div className="flex flex-col sm:flex-row gap-3">
+                        <button
+                          onClick={generateSpeechWithAI}
+                          disabled={isGeneratingSpeech}
+                          className="flex-1 bg-neutral-900 dark:bg-white text-white dark:text-black font-black py-3 px-6 rounded-xl transition-all duration-200 active:scale-[0.98] flex items-center justify-center gap-2 text-xs cursor-pointer disabled:opacity-50"
+                        >
+                          {isGeneratingSpeech ? (
+                            <RefreshCw size={14} className="animate-spin" />
+                          ) : (
+                            <Sparkles size={14} />
+                          )}
+                          <span>{isGeneratingSpeech ? 'Gerando...' : 'Gerar com IA'}</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="flex justify-between items-center pt-4 border-t border-black/[0.06] dark:border-white/[0.06]">
+                      <button
+                        onClick={() => setConfigStep(3)}
+                        className="btn-custom !py-2.5 !px-5 !text-xs font-black tracking-wide relative overflow-hidden flex items-center gap-1.5"
+                      >
+                        Voltar
+                      </button>
+                      <button
+                        onClick={handleGeneratePrompt}
+                        className="btn-custom !py-2.5 !px-6 !text-xs font-black tracking-wide relative overflow-hidden flex items-center gap-1.5"
                       >
                         <Sparkles size={13} />
                         <span>Gerar Prompt Final</span>

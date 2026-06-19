@@ -62,16 +62,15 @@ export default function Sidebar({ isExpanded, setIsExpanded, activeItem, onItemC
     { id: 'virais', label: 'Produtos Virais', icon: Flame, visible: tabProducts },
     { id: 'find-group', label: 'Criar UGC', icon: Video, visible: tabFindGroup },
     { id: 'templates-video', label: 'Templates de Vídeo', icon: Film, visible: true },
-    { id: 'aulas', label: 'Aulas', icon: PlayCircle, visible: true },
   ].filter(item => item.visible);
 
   // Dynamic Styles based on Light/Dark Mode
   const sidebarStyles = {
     background: isDarkMode 
-      ? '#0A0A0A' 
+      ? '#030303' 
       : 'linear-gradient(180deg, #ffffff 0%, #f4f5f8 100%)',
     border: isDarkMode 
-      ? '1px solid rgba(255, 255, 255, 0.08)' 
+      ? '1px solid rgba(255, 255, 255, 0.03)' 
       : '1px solid rgba(0, 0, 0, 0.06)',
     boxShadow: isDarkMode 
       ? '0 30px 100px rgba(0, 0, 0, 0.95), 0 10px 40px rgba(0, 0, 0, 0.85), inset 0 1px 1px rgba(255, 255, 255, 0.1), 0 0 1px 1px rgba(255, 255, 255, 0.05)'

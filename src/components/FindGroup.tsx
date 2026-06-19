@@ -1059,9 +1059,9 @@ export default function FindGroup({ onNotification, product: propProduct, onNavi
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-[300px] overflow-y-auto custom-scrollbar pr-1">
                   {favoritedProducts.length === 0 ? (
-                    <div className="col-span-2 py-10 flex flex-col items-center justify-center text-center space-y-3 opacity-40">
-                      <Heart size={32} />
-                      <p className="text-sm font-bold">Nenhum produto favorito encontrado.</p>
+                    <div className="col-span-2 py-10 flex flex-col items-center justify-center text-center space-y-3" style={{ textAlign: 'center', padding: 24, color: 'rgba(255,255,255,0.4)' }}>
+                      <Heart size={32} style={{ marginBottom: 8 }} />
+                      <p style={{ fontSize: 14 }}>Você ainda não favoritou nenhum produto.</p>
                     </div>
                   ) : (
                     favoritedProducts.map((p) => {
@@ -1860,7 +1860,7 @@ export default function FindGroup({ onNotification, product: propProduct, onNavi
                         10
                       </span>
                       <h2 className="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-1.5">
-                        <span>Fala do avatar</span>
+                        <span>Voz de Conversa Real</span>
                         <span className="text-[10px] py-0.5 px-2 font-normal rounded bg-neutral-100 dark:bg-white/[0.04] text-neutral-400">
                           Opcional
                         </span>
@@ -1884,10 +1884,10 @@ export default function FindGroup({ onNotification, product: propProduct, onNavi
 
                   <div className="space-y-1.5">
                     <span className="text-[10px] font-semibold text-neutral-400 leading-tight block">
-                      Deixe em branco para a IA criar automaticamente de acordo com as configurações especificadas.
+                      Voz de Conversa Real (Deixe em branco para o avatar NÃO FALAR e a IA escolher automaticamente o roteiro)
                     </span>
                     <textarea
-                      placeholder="Deixe em branco para a IA criar automaticamente..."
+                      placeholder="Deixe em branco para o avatar NÃO FALAR e a IA escolher automaticamente o roteiro..."
                       value={customSpeech}
                       onChange={(e) => setCustomSpeech(e.target.value)}
                       rows={4}

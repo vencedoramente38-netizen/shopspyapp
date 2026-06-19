@@ -8,7 +8,7 @@ export interface Product {
   desconto: string;
   avaliacao: number;
   vendas: string;
-  comissao: string;
+  comissao?: string;
   imagem: string;
   link: string;
   scoreViral: number;

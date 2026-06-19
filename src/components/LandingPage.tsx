@@ -613,7 +613,7 @@ export default function LandingPage({ onEnterLogin }: LandingPageProps) {
           backgroundColor: scrolled ? "rgba(255, 255, 255, 0.96)" : "rgba(255, 255, 255, 0.94)",
           borderColor: scrolled ? "rgba(208, 1, 27, 0.22)" : "rgba(0, 0, 0, 0.05)",
           boxShadow: scrolled
-            ? "0 20px 40px -15px rgba(208, 1, 27, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.7)"
+            ? "0 1px 40px rgba(208,1,27,0.06), 0 1px 0 rgba(0,0,0,0.06)"
             : "0 8px 30px rgba(0, 0, 0, 0.02)",
         }}
         transition={{
@@ -698,7 +698,10 @@ export default function LandingPage({ onEnterLogin }: LandingPageProps) {
       {/* SEÇÃO HERO */}
       <header id="inicio" className="relative pt-[160px] pb-20 px-6 max-w-[1000px] mx-auto text-center bg-white overflow-hidden">
         {/* Soft background ambient radial gradient color */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px] bg-[#D0011B]/4 blur-[120px] -z-10 rounded-full" />
+        <div 
+          className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px] -z-10 rounded-full" 
+          style={{ background: 'radial-gradient(ellipse 80% 60% at 50% -10%, rgba(208,1,27,0.08) 0%, transparent 70%)' }}
+        />
 
         {/* Particles overlay inside the hero section */}
         <div className="absolute inset-0 -z-5 pointer-events-none opacity-40">
@@ -931,7 +934,6 @@ export default function LandingPage({ onEnterLogin }: LandingPageProps) {
               { icon: <Video size={24} />, title: "Gerador de Vídeos IA", desc: "Crie prompts profissionais para gerar vídeos dos seus produtos com Google Flow" },
               { icon: <Zap size={24} />, title: "Nova Estrutura Viral", desc: "Gere roteiros e copies otimizados para alcançar mais compradores" },
               { icon: <Users size={24} />, title: "Encontrar Grupos", desc: "Encontre os maiores grupos do Facebook para divulgar seus produtos" },
-              { icon: <BookOpen size={24} />, title: "Área de Aulas", desc: "Treinamento completo do zero ao avançado com aulas práticas e atualizadas" },
               { icon: <Gift size={24} />, title: "Indique e Ganhe", desc: "Convide amigos e ganhe recompensas exclusivas a cada indicação confirmada" },
               { icon: <BarChart2 size={24} />, title: "Score Viral", desc: "Cada produto tem pontuação de viralidade para você escolher os melhores" },
               { icon: <Copy size={24} />, title: "Copy Pronta", desc: "Copies de venda geradas automaticamente e personalizadas para cada produto" }
@@ -1029,124 +1031,6 @@ export default function LandingPage({ onEnterLogin }: LandingPageProps) {
                 </div>
               );
             })}
-          </div>
-        </div>
-      </section>
-
-      {/* SEÇÃO MÓDULOS DE AULAS */}
-      <section id="modulos" className="px-6 py-20 bg-[#f9f9f9]">
-        <div className="max-w-[1200px] mx-auto text-center mb-12">
-          <h2 className="text-[32px] sm:text-[36px] font-black text-[#111111] leading-tight tracking-tight">
-            O que Você vai Aprender
-          </h2>
-          <p className="text-[#555555] mt-2 font-semibold">
-            Aulas exclusivas do zero ao avançado para membros da plataforma
-          </p>
-        </div>
-
-        <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Módulo 1 */}
-          <div className="bg-white border border-[#e5e5e5] rounded-[14px] overflow-hidden shadow-xs flex flex-col justify-between hover:shadow-md transition-all duration-300">
-            <div className="h-44 bg-emerald-500/5 flex flex-col items-center justify-center p-6 relative border-b border-[#e5e5e5]/50 select-none">
-              <span className="absolute top-4 left-4 bg-[#22C55E]/10 border border-[#22C55E]/20 text-[#22C55E] text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wide font-sans">
-                ✅ DISPONÍVEL
-              </span>
-              <div className="w-12 h-12 rounded-full bg-[#22C55E]/15 border border-[#22C55E]/20 text-[#22C55E] flex items-center justify-center shadow-xs transform hover:scale-105 transition-transform">
-                <PlayCircle size={22} fill="currentColor" className="translate-x-0.5" />
-              </div>
-            </div>
-            
-            <div className="p-6 flex-1 flex flex-col justify-between text-left">
-              <div>
-                <span className="inline-block bg-[#D0011B] text-white text-[9px] font-black px-2.5 py-1 rounded mb-3 uppercase tracking-wider">
-                  Módulo 1
-                </span>
-                <h3 className="text-lg font-bold text-[#111111] leading-snug">
-                  Como Criar sua Conta como Afiliado Shopee
-                </h3>
-                <p className="text-sm text-gray-500 mt-2 leading-relaxed font-semibold">
-                  Passo a passo completo e prático para cadastrar sua conta de vendas, ser aprovado rápido e resgatar seu link.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Módulo 2 */}
-          <div className="bg-white border border-[#e5e5e5] rounded-[14px] overflow-hidden shadow-xs flex flex-col justify-between hover:shadow-md transition-all duration-300">
-            <div className="h-44 bg-neutral-100 flex flex-col items-center justify-center p-6 relative border-b border-[#e5e5e5]/50">
-              <span className="absolute top-4 left-4 bg-gray-200 text-gray-600 text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wide">
-                EM BREVE
-              </span>
-              <div className="w-12 h-12 rounded-full bg-neutral-200 text-neutral-505 flex items-center justify-center shadow-xs">
-                <Lock size={18} className="text-gray-500" />
-              </div>
-            </div>
-            
-            <div className="p-6 flex-1 flex flex-col justify-between text-left">
-              <div>
-                <span className="inline-block bg-neutral-400 text-white text-[9px] font-black px-2.5 py-1 rounded mb-3 uppercase tracking-wider">
-                  Módulo 2
-                </span>
-                <h3 className="text-lg font-bold text-[#111111] leading-snug">
-                  Como Escolher Produtos de Alto Score Viral
-                </h3>
-                <p className="text-sm text-gray-500 mt-2 leading-relaxed font-semibold">
-                  A estratégia exata para ler os scores de viralidade e escolher apenas produtos campeões que explodem nas redes sociais.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Módulo 3 */}
-          <div className="bg-white border border-[#e5e5e5] rounded-[14px] overflow-hidden shadow-xs flex flex-col justify-between hover:shadow-md transition-all duration-300">
-            <div className="h-44 bg-neutral-100 flex flex-col items-center justify-center p-6 relative border-b border-[#e5e5e5]/50">
-              <span className="absolute top-4 left-4 bg-gray-200 text-gray-600 text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wide">
-                EM BREVE
-              </span>
-              <div className="w-12 h-12 rounded-full bg-neutral-200 text-neutral-505 flex items-center justify-center shadow-xs">
-                <Lock size={18} className="text-gray-500" />
-              </div>
-            </div>
-            
-            <div className="p-6 flex-1 flex flex-col justify-between text-left">
-              <div>
-                <span className="inline-block bg-neutral-400 text-white text-[9px] font-black px-2.5 py-1 rounded mb-3 uppercase tracking-wider">
-                  Módulo 3
-                </span>
-                <h3 className="text-lg font-bold text-[#111111] leading-snug">
-                  Copy de Vendas e Roteiros Persuasivos
-                </h3>
-                <p className="text-sm text-gray-500 mt-2 leading-relaxed font-semibold">
-                  A estrutura da copy irresistível: criamos textos prontos sob medida que capturam atenção e convertem cliques em compras.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Módulo 4 */}
-          <div className="bg-white border border-[#e5e5e5] rounded-[14px] overflow-hidden shadow-xs flex flex-col justify-between hover:shadow-md transition-all duration-300">
-            <div className="h-44 bg-neutral-100 flex flex-col items-center justify-center p-6 relative border-b border-[#e5e5e5]/50">
-              <span className="absolute top-4 left-4 bg-gray-200 text-gray-600 text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wide">
-                EM BREVE
-              </span>
-              <div className="w-12 h-12 rounded-full bg-neutral-200 text-neutral-505 flex items-center justify-center shadow-xs">
-                <Lock size={18} className="text-gray-500" />
-              </div>
-            </div>
-            
-            <div className="p-6 flex-1 flex flex-col justify-between text-left">
-              <div>
-                <span className="inline-block bg-neutral-400 text-white text-[9px] font-black px-2.5 py-1 rounded mb-3 uppercase tracking-wider">
-                  Módulo 4
-                </span>
-                <h3 className="text-lg font-bold text-[#111111] leading-snug">
-                  Postando Inteligente com Estratégia de Grupos
-                </h3>
-                <p className="text-sm text-gray-500 mt-2 leading-relaxed font-semibold">
-                  Descubra os segredos de algoritmo das maiores comunidades, permitindo postagens constantes que geram cliques ininterruptos.
-                </p>
-              </div>
-            </div>
           </div>
         </div>
       </section>
@@ -1358,10 +1242,10 @@ export default function LandingPage({ onEnterLogin }: LandingPageProps) {
                   {couponApplied ? (
                     <div>
                       <div className="flex items-baseline gap-1.5">
-                        <span className="text-sm font-bold text-gray-400 line-through">De R$ 697</span>
+                        <span className="text-sm font-bold text-gray-400 line-through">De R$ 997</span>
                         <span className="text-lg font-bold text-[#D0011B] mr-1">R$</span>
                         <span className="text-6xl font-black tracking-tight text-[#D0011B] font-['Space_Grotesk']">147</span>
-                        <span className="text-gray-400 text-sm ml-2 font-light">/vitalício</span>
+                        <span className="text-gray-400 text-sm ml-2">/vitalício</span>
                       </div>
                       <p className="text-[#D0011B] text-xs font-black mt-2 tracking-wider uppercase flex items-center gap-1.5">
                         <span className="w-2 h-2 rounded-full bg-[#D0011B] animate-ping" />
@@ -1391,10 +1275,10 @@ export default function LandingPage({ onEnterLogin }: LandingPageProps) {
                       <div className="flex flex-col">
                         <div className="flex items-baseline">
                           <span className="text-lg font-bold text-neutral-400 mr-1">R$</span>
-                          <span className="text-6xl font-black tracking-tight text-neutral-900 font-['Space_Grotesk']">697</span>
+                          <span className="text-6xl font-black tracking-tight text-neutral-900 font-['Space_Grotesk']">497</span>
                           <span className="text-gray-45b text-sm ml-2 font-medium">/vitalício</span>
                         </div>
-                        <p className="text-[#D0011B] text-sm font-bold mt-2 font-sans">ou 12x de R$ 74,27</p>
+                        <p className="text-[#D0011B] text-sm font-bold mt-2 font-sans">ou 12x de R$ 49,91</p>
                       </div>
                     </div>
                   )}

@@ -91,6 +91,7 @@ export default function Dashboard({ products: productsProp, isDarkMode = true }:
   const [views, setViews] = useState<number>(() => parseSavedInt('shopspy_metric_views', 0));
   const [orders, setOrders] = useState<number>(() => parseSavedInt('shopspy_metric_orders', 0));
   const [units, setUnits] = useState<number>(() => parseSavedInt('shopspy_metric_units', 0));
+  const [commissionTotal, setCommissionTotal] = useState<number>(() => parseSavedFloat('shopspy_dashboard_commission', 0));
   
   // Period pill state
   const [activePeriod, setActivePeriod] = useState('Semana');
@@ -160,6 +161,7 @@ export default function Dashboard({ products: productsProp, isDarkMode = true }:
       setViews(parseSavedInt('shopspy_metric_views', 0));
       setOrders(parseSavedInt('shopspy_metric_orders', 0));
       setUnits(parseSavedInt('shopspy_metric_units', 0));
+      setCommissionTotal(parseSavedFloat('shopspy_dashboard_commission', 0));
       
       try {
         const saved = localStorage.getItem('shopspy_recent_sales');
@@ -178,6 +180,7 @@ export default function Dashboard({ products: productsProp, isDarkMode = true }:
       setViews(parseSavedInt('shopspy_metric_views', 0));
       setOrders(parseSavedInt('shopspy_metric_orders', 0));
       setUnits(parseSavedInt('shopspy_metric_units', 0));
+      setCommissionTotal(parseSavedFloat('shopspy_dashboard_commission', 0));
       
       // Trigger a re-render of useMemo by forcing a state update if needed
       // but usually the event itself is enough to trigger the components listening to it
@@ -200,7 +203,8 @@ export default function Dashboard({ products: productsProp, isDarkMode = true }:
     localStorage.setItem('shopspy_metric_views', String(views));
     localStorage.setItem('shopspy_metric_orders', String(orders));
     localStorage.setItem('shopspy_metric_units', String(units));
-  }, [salesTotal, visitors, views, orders, units]);
+    localStorage.setItem('shopspy_dashboard_commission', commissionTotal.toFixed(2).replace('.', ','));
+  }, [salesTotal, visitors, views, orders, units, commissionTotal]);
 
   // One-time run to clear legacy metrics and start fresh at 0 as requested
   useEffect(() => {
@@ -218,6 +222,7 @@ export default function Dashboard({ products: productsProp, isDarkMode = true }:
       setViews(0);
       setOrders(0);
       setUnits(0);
+      setCommissionTotal(0);
       setRecentSales([]);
       localStorage.setItem('shopspy_db_reset_done_v5', 'true');
       window.dispatchEvent(new CustomEvent('shopspy_settings_updated'));
@@ -241,6 +246,7 @@ export default function Dashboard({ products: productsProp, isDarkMode = true }:
       }, ...prev].slice(0, 10));
 
       setSalesTotal(prev => prev + price);
+      setCommissionTotal(prev => prev + (price * 0.1));
       setOrders(prev => prev + 1);
       
       // Update auxiliary indicators 
@@ -393,7 +399,7 @@ export default function Dashboard({ products: productsProp, isDarkMode = true }:
     },
     { 
       label: `Comissão est. (${activeCurrency})`, 
-      value: showValues ? (adminMetricsOverride.comissao ? (activeCurrency === 'BRL' ? `R$ ${adminMetricsOverride.comissao}` : formatCurrency(parseSavedFloat(`shopspy_admin_comissao`, 0))) : formatCurrency(currentPeriodData.sales * 0.1)) : '••••', 
+      value: showValues ? (adminMetricsOverride.comissao ? (activeCurrency === 'BRL' ? `R$ ${adminMetricsOverride.comissao}` : formatCurrency(parseSavedFloat(`shopspy_admin_comissao`, 0))) : formatCurrency(commissionTotal)) : '••••', 
       change: adminMetricsOverride.var_comissao || currentPeriodData.changeSales, 
       icon: 'DollarSign' 
     },
@@ -755,7 +761,7 @@ export default function Dashboard({ products: productsProp, isDarkMode = true }:
                   Total Comissões
                 </span>
                 <h4 className="text-[20px] font-black text-[#10b981] mt-1 m-0 leading-none">
-                  {formatCurrency(salesTotal * 0.1)}
+                  {formatCurrency(commissionTotal)}
                 </h4>
               </div>
               <div className="text-right">

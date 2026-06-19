@@ -13,7 +13,7 @@ export default function FeaturedSectionStats({ onEnterLogin }: FeaturedSectionSt
             Quem Usa, Aprova
           </span>
           <h2 className="text-2.5xl sm:text-4xl font-extrabold text-[#111111] max-w-md mx-auto leading-tight">
-            Centenas de afiliados já estão lucrando com o TikShopfy
+            Centenas de afiliados já estão lucrando com o SHOPSPY
           </h2>
         </div>
 
