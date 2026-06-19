@@ -26,7 +26,10 @@ import {
   Sliders,
   Sparkle,
   RotateCcw,
-  Tv
+  Tv,
+  Heart,
+  ImagePlus,
+  Type
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { products as initialProducts } from '../data/products';
@@ -109,7 +112,8 @@ export default function VideoTemplates({ onNotification, selectedDefaultProduct 
     { id: 'estudio-minimalista', name: 'Estúdio Minimalista Clean', description: 'Fundo infinito neutro e claro, estética industrial de alto luxo e excelente difusão de luz.' },
     { id: 'rua-urbana', name: 'Ambiente Urbano / Ao Ar Livre', description: 'Cenário externo realista com desfoque de fundo (bokeh), luz solar natural e vibes de rua alegre.' },
     { id: 'sala-luxuosa', name: 'Sala de Estar Sofisticada', description: 'Mobiliário escandinavo moderno, cortinas finas e plantas ornamentais estéticas.' },
-    { id: 'closet-chique', name: 'Espelho do Closet Elegante', description: 'Foco moderno de provador com iluminação frontal tipo estúdio, espelhos e armários organizados.' }
+    { id: 'closet-chique', name: 'Espelho do Closet Elegante', description: 'Foco moderno de provador com iluminação frontal tipo estúdio, espelhos e armários organizados.' },
+    { id: 'personalized', name: 'Personalizado', description: 'Escreva seu próprio cenário detalhado para o vídeo.' }
   ];
 
   // State Management
@@ -120,28 +124,43 @@ export default function VideoTemplates({ onNotification, selectedDefaultProduct 
   const [isLoading, setIsLoading] = useState(false);
   
   const [searchProductQuery, setSearchProductQuery] = useState('');
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(selectedDefaultProduct || initialProducts[0]);
-  const [selectedAvatar, setSelectedAvatar] = useState<Avatar>(avatars[0]);
-  const [selectedScenario, setSelectedScenario] = useState<Scenario>(scenarios[0]);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [selectedAvatar, setSelectedAvatar] = useState<Avatar | null>(null);
+  const [selectedScenario, setSelectedScenario] = useState<Scenario | null>(null);
+  const [customScenarioText, setCustomScenarioText] = useState('');
   const [genderFilter, setGenderFilter] = useState<'Todos' | 'Homem' | 'Mulher'>('Todos');
   
   const [isGenerating, setIsGenerating] = useState(false);
   const [isDownloadingImage, setIsDownloadingImage] = useState(false);
   const [isDownloadingAvatar, setIsDownloadingAvatar] = useState(false);
   const [isPromptExpanded, setIsPromptExpanded] = useState(true);
+  const [isCustomProductMode, setIsCustomProductMode] = useState(false);
+  const [customProductImage, setCustomProductImage] = useState<string | null>(null);
 
-  // Search filter for products
+  // FAVORITOS + BUSCA logic
+  const getFavoritedProducts = (): Product[] => {
+    try {
+      const favIds = JSON.parse(localStorage.getItem('shopspy_favorites') || '[]');
+      return initialProducts.filter(p => favIds.includes(p.id));
+    } catch {
+      return [];
+    }
+  };
+
+  const favoritedProducts = getFavoritedProducts();
+
   const filteredProducts = useMemo(() => {
-    return initialProducts.filter(p => 
+    return favoritedProducts.filter(p => 
       p.nome.toLowerCase().includes(searchProductQuery.toLowerCase()) ||
       p.categoria.toLowerCase().includes(searchProductQuery.toLowerCase())
     );
-  }, [searchProductQuery]);
+  }, [searchProductQuery, favoritedProducts]);
 
   // Filter avatars based on gender selection
   const filteredAvatars = useMemo(() => {
     if (genderFilter === 'Todos') return avatars;
-    return avatars.filter(av => av.genero === genderFilter);
+    const filtered = avatars.filter(av => av.genero === genderFilter);
+    return filtered;
   }, [genderFilter]);
 
   // Handle template selection
@@ -219,6 +238,18 @@ export default function VideoTemplates({ onNotification, selectedDefaultProduct 
       onNotification("Iniciando download da imagem...");
       
       const imageUrl = selectedProduct.imagem;
+      
+      if (imageUrl.startsWith('data:')) {
+        const a = document.createElement('a');
+        a.href = imageUrl;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        onNotification("Imagem do criativo salva com sucesso! 📸");
+        return;
+      }
+
       const response = await fetch(imageUrl);
       const blob = await response.blob();
       const blobUrl = URL.createObjectURL(blob);
@@ -270,6 +301,18 @@ export default function VideoTemplates({ onNotification, selectedDefaultProduct 
       onNotification("Iniciando download do avatar...");
       
       const imageUrl = selectedAvatar.image;
+
+      if (imageUrl.startsWith('data:')) {
+        const a = document.createElement('a');
+        a.href = imageUrl;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        onNotification("Imagem do avatar salva com sucesso! 📸");
+        return;
+      }
+
       const response = await fetch(imageUrl);
       const blob = await response.blob();
       const blobUrl = URL.createObjectURL(blob);
@@ -342,7 +385,7 @@ export default function VideoTemplates({ onNotification, selectedDefaultProduct 
 - Visuals: Perfect symmetrical facial features, neat modern styling, highly expressive talking-to-camera presentation, charismatic and welcoming smile, natural fluid body gestures.
 
 [ENVIRONMENT & SCENARIO]:
-- Scene setting: ${selectedScenario.name}. Detailed description: ${selectedScenario.description}.
+- Scene setting: ${selectedScenario?.id === 'personalized' ? 'Custom Scenario' : selectedScenario?.name}. Detailed description: ${selectedScenario?.id === 'personalized' ? customScenarioText : selectedScenario?.description}.
 - Lighting: Professional studio key lights, soft ambient fill, warm rim lighting accents, gorgeous realistic background bokeh, accurate soft shadows.
 
 [PRODUCT INTEGRATION & SALES CTAs]:
@@ -350,10 +393,14 @@ export default function VideoTemplates({ onNotification, selectedDefaultProduct 
 - Product Category: "${shortCategory}" (Product Price: ${selectedProduct.preco})
 - Interaction: The model explicitly holds, rotates, and demonstrates the features of "${cleanProductName}" with great happiness and confidence, ensuring the product's details and label are readable and look pristine under the camera focus.`;
 
+    const copy = `🌟 NOVIDADE! 🌟\n\nConfira o(a) ${cleanProductName} que acaba de chegar! 🚀\n\n✅ Alta Qualidade\n✅ Design Moderno\n✅ Melhor Custo-Benefício\n\nGaranta o seu agora! 🛍️\n\n#Shopee #UGC #Criativo #Marketing #Vendas`;
+
     return {
-      englishPrompt: engPrompt
+      englishPrompt: engPrompt,
+      productDescription: copy,
+      mergePrompt: `High resolution RAW photo of "${cleanProductName}" held by a person, realistic hands, ${selectedScenario?.id === 'personalized' ? customScenarioText : selectedScenario?.description}, studio lighting, highly detailed, 8k --v 6.0`
     };
-  }, [selectedTemplate, selectedProduct, selectedAvatar, selectedScenario]);
+  }, [selectedTemplate, selectedProduct, selectedAvatar, selectedScenario, customScenarioText]);
 
   // Copy helper
   const handleCopyToClipboard = (text: string, label: string) => {
@@ -586,64 +633,162 @@ export default function VideoTemplates({ onNotification, selectedDefaultProduct 
                           </h2>
                         </div>
                       </div>
-                      {selectedProduct && (
-                        <span className="text-[10px] font-bold text-gray-400 dark:text-white/45 bg-gray-100 dark:bg-white/[0.04] px-2.5 py-1 rounded">
-                          Comissão: {selectedProduct.comissao}
-                        </span>
-                      )}
-                    </div>
-
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none text-gray-400">
-                        <Search size={16} />
+                      
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => setIsCustomProductMode(!isCustomProductMode)}
+                          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-[10px] font-black uppercase tracking-wider transition-all ${
+                            isCustomProductMode 
+                              ? 'bg-[#D0011B] text-white border-[#D0011B] shadow-lg shadow-[#D0011B]/20' 
+                              : 'bg-white dark:bg-white/[0.03] text-gray-600 dark:text-white/60 border-black/5 dark:border-white/[0.08] hover:border-[#D0011B]'
+                          }`}
+                        >
+                          <ImagePlus size={14} />
+                          <span>{isCustomProductMode ? 'Escolher da Lista' : 'Criar Customizado'}</span>
+                        </button>
                       </div>
-                      <input 
-                        type="text" 
-                        value={searchProductQuery}
-                        onChange={(e) => setSearchProductQuery(e.target.value)}
-                        placeholder="Pesquisar entre os produtos da lista de virais..."
-                        className="w-full pl-9 pr-4 py-3 text-xs bg-neutral-100 dark:bg-white/[0.03] text-gray-900 dark:text-white border border-black/5 dark:border-white/[0.08] rounded-xl focus:border-[#D0011B]/40 focus:outline-none focus:ring-1 focus:ring-[#D0011B]/35 transition-all"
-                      />
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-[300px] overflow-y-auto custom-scrollbar pr-1">
-                      {filteredProducts.map((prod) => {
-                        const isSelected = selectedProduct?.id === prod.id;
-                        return (
-                          <div 
-                            key={prod.id}
-                            onClick={() => setSelectedProduct(prod)}
-                            className={`flex items-center gap-3 p-3 rounded-[12px] cursor-pointer transition-all border relative overflow-hidden ${
-                              isSelected 
-                                ? 'border-[#D0011B] bg-[#D0011B]/[0.06]' 
-                                : 'border-neutral-200 dark:border-white/[0.06] hover:border-neutral-300 dark:hover:border-white/10 bg-transparent'
-                            }`}
-                          >
-                            <img 
-                              src={prod.imagem} 
-                              alt={prod.nome} 
-                              referrerPolicy="no-referrer"
-                              className="w-11 h-11 object-cover rounded-lg border border-black/5 dark:border-white/10 shrink-0" 
-                            />
-                            <div className="flex-1 min-w-0">
-                              <p className="text-xs font-bold text-gray-900 dark:text-white truncate leading-tight">
-                                {prod.nome}
-                              </p>
-                              <div className="flex items-center gap-2 mt-1 text-[9px] text-gray-400 dark:text-white/45 font-bold">
-                                <span className="text-[#D0011B]">{prod.preco}</span>
-                                <span>•</span>
-                                <span className="text-emerald-500 dark:text-emerald-400">Comissão: {prod.comissao}</span>
-                              </div>
-                            </div>
-                            {isSelected && (
-                              <div className="w-5 h-5 rounded-full bg-[#D0011B] flex items-center justify-center text-white text-[10px] font-bold shrink-0">
-                                ✓
-                              </div>
-                            )}
+                    {!isCustomProductMode ? (
+                      <>
+                        <div className="relative">
+                          <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none text-gray-400">
+                            <Search size={16} />
                           </div>
-                        );
-                      })}
-                    </div>
+                          <input 
+                            type="text" 
+                            value={searchProductQuery}
+                            onChange={(e) => setSearchProductQuery(e.target.value)}
+                            placeholder="Pesquisar entre seus favoritos..."
+                            className="w-full pl-9 pr-4 py-3 text-xs bg-neutral-100 dark:bg-white/[0.03] text-gray-900 dark:text-white border border-black/5 dark:border-white/[0.08] rounded-xl focus:border-[#D0011B]/40 focus:outline-none focus:ring-1 focus:ring-[#D0011B]/35 transition-all"
+                          />
+                        </div>
+
+                        {favoritedProducts.length === 0 ? (
+                          <div className="flex flex-col items-center justify-center py-12 border-2 border-dashed border-black/5 dark:border-white/5 rounded-2xl bg-neutral-50/50 dark:bg-white/[0.01]">
+                            <Heart size={32} className="text-gray-300 dark:text-white/10 mb-3" />
+                            <p className="text-xs font-bold text-gray-400 dark:text-white/30 text-center">
+                              Você ainda não tem produtos favoritos.<br/>
+                              Favorite produtos na aba de Mineração para vê-los aqui!
+                            </p>
+                          </div>
+                        ) : filteredProducts.length === 0 ? (
+                          <div className="flex flex-col items-center justify-center py-10 text-gray-400 dark:text-white/30">
+                            <Search size={24} className="mb-2 opacity-20" />
+                            <p className="text-[11px] font-bold">Nenhum favorito encontrado para "{searchProductQuery}"</p>
+                          </div>
+                        ) : (
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-[300px] overflow-y-auto custom-scrollbar pr-1">
+                            {filteredProducts.map((prod) => {
+                              const isSelected = selectedProduct?.id === prod.id && !isCustomProductMode;
+                              return (
+                                <div 
+                                  key={prod.id}
+                                  onClick={() => {
+                                    setSelectedProduct(prod);
+                                    setIsCustomProductMode(false);
+                                  }}
+                                  className={`flex items-center gap-3 p-3 rounded-[12px] cursor-pointer transition-all border relative overflow-hidden ${
+                                    isSelected 
+                                      ? 'border-[#D0011B] bg-[#D0011B]/[0.06]' 
+                                      : 'border-neutral-200 dark:border-white/[0.06] hover:border-neutral-300 dark:hover:border-white/10 bg-transparent'
+                                  }`}
+                                >
+                                  <img 
+                                    src={prod.imagem} 
+                                    alt={prod.nome} 
+                                    className="w-11 h-11 object-cover rounded-lg border border-black/5 dark:border-white/10 shrink-0" 
+                                  />
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-xs font-bold text-gray-900 dark:text-white truncate leading-tight">
+                                      {prod.nome}
+                                    </p>
+                                    <div className="flex items-center gap-2 mt-1 text-[9px] text-gray-400 dark:text-white/45 font-bold">
+                                      <span className="text-[#D0011B]">{prod.preco}</span>
+                                      <span>•</span>
+                                      <span className="text-emerald-500 dark:text-emerald-400">Comissão: {prod.comissao}</span>
+                                    </div>
+                                  </div>
+                                  {isSelected && (
+                                    <div className="w-5 h-5 rounded-full bg-[#D0011B] flex items-center justify-center text-white text-[10px] font-bold shrink-0">
+                                      ✓
+                                    </div>
+                                  )}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </>
+                    ) : (
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-1 gap-4">
+                          <div className="space-y-2">
+                            <label className="text-[10px] font-black uppercase tracking-widest text-[#D0011B] block ml-1">
+                              Imagem do Produto (Upload)
+                            </label>
+                            <label className="flex flex-col items-center justify-center w-full aspect-video border-2 border-dashed border-black/5 dark:border-white/10 rounded-2xl cursor-pointer hover:bg-neutral-50 dark:hover:bg-white/[0.02] transition-all overflow-hidden bg-neutral-100 dark:bg-white/[0.03] group relative">
+                              {customProductImage ? (
+                                <>
+                                  <img 
+                                    src={customProductImage} 
+                                    className="w-full h-full object-contain" 
+                                    alt="Preview" 
+                                  />
+                                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                                    <div className="flex items-center gap-2 bg-white text-black px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-wider">
+                                      <RefreshCw size={14} /> Trocar Imagem
+                                    </div>
+                                  </div>
+                                </>
+                              ) : (
+                                <div className="flex flex-col items-center gap-3">
+                                  <div className="w-12 h-12 rounded-full bg-white dark:bg-white/5 border border-black/5 dark:border-white/10 flex items-center justify-center shadow-lg">
+                                    <ImagePlus size={22} className="text-[#D0011B]" />
+                                  </div>
+                                  <div className="text-center">
+                                    <p className="text-[11px] font-black text-gray-900 dark:text-white uppercase tracking-wider">Clique para Upload</p>
+                                    <p className="text-[9px] text-gray-400 dark:text-white/30 font-bold mt-1">PNG, JPG ou WEBP (Máx. 5MB)</p>
+                                  </div>
+                                </div>
+                              )}
+                              <input 
+                                type="file" 
+                                className="hidden" 
+                                accept="image/*"
+                                onChange={(e) => {
+                                  const file = e.target.files?.[0];
+                                  if (file) {
+                                    const reader = new FileReader();
+                                    reader.onloadend = () => {
+                                      const base64 = reader.result as string;
+                                      setCustomProductImage(base64);
+                                      const newProd: Product = {
+                                        id: 99999,
+                                        nome: 'Produto Customizado',
+                                        imagem: base64,
+                                        preco: 'R$ 0,00',
+                                        precoOriginal: 'R$ 0,00',
+                                        desconto: '0%',
+                                        ranking: 0,
+                                        avaliacao: 5,
+                                        vendas: '0',
+                                        link: '#',
+                                        scoreViral: 0,
+                                        comissao: 'R$ 0,00',
+                                        categoria: 'Customizado'
+                                      };
+                                      setSelectedProduct(newProd);
+                                    };
+                                    reader.readAsDataURL(file);
+                                  }
+                                }}
+                              />
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+                    )}
 
                     <div className="flex justify-between items-center pt-4 border-t border-black/[0.06] dark:border-white/[0.06]">
                       <button
@@ -717,6 +862,7 @@ export default function VideoTemplates({ onNotification, selectedDefaultProduct 
                                 src={av.image} 
                                 alt={av.nome} 
                                 className="w-full h-full object-cover object-top transition-transform duration-300 group-hover/card:scale-105" 
+                                style={{ imageRendering: 'high-quality', objectPosition: 'top center' }}
                               />
                               <div className="absolute top-2 left-2">
                                 <span className="text-[9px] font-black tracking-wide px-2 py-0.5 bg-black/60 backdrop-blur-md text-white rounded-full">
@@ -755,7 +901,8 @@ export default function VideoTemplates({ onNotification, selectedDefaultProduct 
                       </button>
                       <button
                         onClick={() => setConfigStep(3)}
-                        className="btn-custom !py-2.5 !px-6 !text-xs font-black tracking-wide relative overflow-hidden flex items-center gap-1.5"
+                        disabled={!selectedAvatar}
+                        className="btn-custom !py-2.5 !px-6 !text-xs font-black tracking-wide relative overflow-hidden flex items-center gap-1.5 disabled:opacity-50"
                       >
                         <span>Próximo</span>
                         <ArrowRight size={13} />
@@ -803,6 +950,23 @@ export default function VideoTemplates({ onNotification, selectedDefaultProduct 
                       })}
                     </div>
 
+                    {selectedScenario?.id === 'personalized' && (
+                      <div className="space-y-3 pt-2">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Type size={16} className="text-[#D0011B]" />
+                          <label className="text-[10px] font-black uppercase tracking-widest text-[#D0011B]">
+                            Descreva seu Cenário Customizado
+                          </label>
+                        </div>
+                        <textarea
+                          value={customScenarioText}
+                          onChange={(e) => setCustomScenarioText(e.target.value)}
+                          placeholder="Ex: Sala moderna iluminada com luz do sol, sofá branco ao fundo, plantas tropicais..."
+                          className="w-full h-32 p-4 text-xs bg-neutral-100 dark:bg-white/[0.03] text-gray-900 dark:text-white border border-black/5 dark:border-white/[0.08] rounded-xl focus:border-[#D0011B]/40 focus:outline-none focus:ring-1 focus:ring-[#D0011B]/35 transition-all resize-none shadow-inner"
+                        />
+                      </div>
+                    )}
+
                     <div className="flex justify-between items-center pt-4 border-t border-black/[0.06] dark:border-white/[0.06]">
                       <button
                         onClick={() => setConfigStep(2)}
@@ -812,10 +976,11 @@ export default function VideoTemplates({ onNotification, selectedDefaultProduct 
                       </button>
                       <button
                         onClick={handleGeneratePrompt}
-                        className="btn-custom !py-2.5 !px-6 !text-xs font-black tracking-wide relative overflow-hidden flex items-center gap-1.5 shadow-lg"
+                        disabled={!selectedScenario || (selectedScenario.id === 'personalized' && !customScenarioText.trim())}
+                        className="btn-custom !py-2.5 !px-6 !text-xs font-black tracking-wide relative overflow-hidden flex items-center gap-1.5 disabled:opacity-50"
                       >
                         <Sparkles size={13} />
-                        <span>Gerar Prompt</span>
+                        <span>Gerar Prompt Final</span>
                       </button>
                     </div>
                   </motion.div>
@@ -888,7 +1053,7 @@ export default function VideoTemplates({ onNotification, selectedDefaultProduct 
                 <button
                   onClick={downloadProductImage}
                   disabled={isDownloadingImage}
-                  className="w-full sm:w-auto bg-[#D0011B] hover:bg-[#D0011B]/95 disabled:opacity-50 text-white font-bold py-2.5 px-4 rounded-[10px] transition-all duration-200 active:scale-[0.98] flex items-center justify-center gap-2 text-xs shadow-sm cursor-pointer"
+                  className="w-full sm:w-auto bg-[#D0011B] hover:bg-[#D0011B]/95 disabled:opacity-50 text-white font-bold py-2.5 px-6 rounded-full transition-all duration-200 active:scale-[0.98] flex items-center justify-center gap-2 text-xs shadow-lg shadow-[#D0011B]/20 cursor-pointer"
                 >
                   {isDownloadingImage ? (
                     <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -897,6 +1062,25 @@ export default function VideoTemplates({ onNotification, selectedDefaultProduct 
                   )}
                   <span>{isDownloadingImage ? 'Baixando...' : 'Baixar Imagem'}</span>
                 </button>
+              </div>
+            </div>
+
+            {/* Descrição do Produto Card */}
+            <div className="bg-white dark:bg-[#111111] border border-black/5 dark:border-white/[0.08] rounded-2xl p-5 shadow-lg space-y-4">
+              <div className="flex justify-between items-start">
+                <span className="text-[9px] font-black tracking-[0.1em] bg-emerald-600/10 text-emerald-500 px-2 py-1 rounded uppercase">
+                  Descrição do Produto (Copy)
+                </span>
+                <button 
+                  onClick={() => handleCopyToClipboard(generatedData.productDescription!, "Copy de Vendas")}
+                  className="flex items-center gap-1.5 px-3 py-1 bg-neutral-100 dark:bg-white/[0.05] rounded-lg text-[10px] font-bold text-gray-600 dark:text-white/60 hover:text-[#D0011B] transition-colors"
+                >
+                  <Copy size={12} />
+                  <span>Copiar Copy</span>
+                </button>
+              </div>
+              <div className="p-4 bg-neutral-50 dark:bg-black/20 rounded-xl border border-black/5 dark:border-white/5 text-[11px] leading-relaxed text-gray-600 dark:text-white/60 whitespace-pre-wrap">
+                {generatedData.productDescription}
               </div>
             </div>
 
@@ -927,7 +1111,7 @@ export default function VideoTemplates({ onNotification, selectedDefaultProduct 
                   <button
                     onClick={downloadAvatarImage}
                     disabled={isDownloadingAvatar}
-                    className="btn-custom !py-2.5 !px-5 !text-xs font-black tracking-wide relative overflow-hidden flex items-center gap-1.5 disabled:opacity-50"
+                    className="w-full sm:w-auto bg-[#D0011B] hover:bg-[#D0011B]/95 disabled:opacity-50 text-white font-bold py-2.5 px-6 rounded-full transition-all duration-200 active:scale-[0.98] flex items-center justify-center gap-2 text-xs shadow-lg shadow-[#D0011B]/20 cursor-pointer"
                   >
                     {isDownloadingAvatar ? (
                       <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -939,6 +1123,25 @@ export default function VideoTemplates({ onNotification, selectedDefaultProduct 
                 </div>
               </div>
             )}
+
+            {/* Prompt para Mesclar Imagens Card */}
+            <div className="bg-white dark:bg-[#111111] border border-black/5 dark:border-white/[0.08] rounded-2xl p-5 shadow-lg space-y-4">
+              <div className="flex justify-between items-start">
+                <span className="text-[9px] font-black tracking-[0.1em] bg-orange-600/10 text-orange-500 px-2 py-1 rounded uppercase">
+                  Prompt para Mesclar Imagens (Midjourney / Flux)
+                </span>
+                <button 
+                  onClick={() => handleCopyToClipboard(generatedData.mergePrompt!, "Prompt de Mesclagem")}
+                  className="flex items-center gap-1.5 px-3 py-1 bg-neutral-100 dark:bg-white/[0.05] rounded-lg text-[10px] font-bold text-gray-600 dark:text-white/60 hover:text-[#D0011B] transition-colors"
+                >
+                  <Copy size={12} />
+                  <span>Copiar Prompt</span>
+                </button>
+              </div>
+              <div className="p-4 bg-neutral-50 dark:bg-black/20 rounded-xl border border-black/5 dark:border-white/5 text-[11px] leading-relaxed text-gray-500 dark:text-white/40 font-mono italic">
+                {generatedData.mergePrompt}
+              </div>
+            </div>
 
             {/* Google Flow Prompt Card (Enormous English Prompt) */}
             <div className="bg-white dark:bg-[#111111] border border-black/5 dark:border-white/[0.08] rounded-2xl p-5 shadow-lg space-y-4">

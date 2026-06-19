@@ -416,17 +416,16 @@ export default function FindGroup({ onNotification, product: propProduct, onNavi
   });
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [selectedScenario, setSelectedScenario] = useState(() => {
-    const raw = localStorage.getItem('shopspy_findgroup_scenario') || "Ambiente doméstico";
-    return raw.replace(/^[\s\p{Emoji}]/u, '').trim();
+    return localStorage.getItem('shopspy_findgroup_scenario') || "";
   });
   const [selectedDuration, setSelectedDuration] = useState(() => {
-    return localStorage.getItem('shopspy_findgroup_duration') || "60 segundos";
+    return localStorage.getItem('shopspy_findgroup_duration') || "";
   });
   const [selectedStyle, setSelectedStyle] = useState(() => {
-    return localStorage.getItem('shopspy_findgroup_style') || "Cinematográfico";
+    return localStorage.getItem('shopspy_findgroup_style') || "";
   });
   const [selectedType, setSelectedType] = useState(() => {
-    return localStorage.getItem('shopspy_findgroup_type') || "Apresentação do produto";
+    return localStorage.getItem('shopspy_findgroup_type') || "";
   });
   const [instructionsText, setInstructionsText] = useState(() => {
     return localStorage.getItem('shopspy_findgroup_instructions') || "";
@@ -435,6 +434,22 @@ export default function FindGroup({ onNotification, product: propProduct, onNavi
     return localStorage.getItem('shopspy_findgroup_custom_scenario') || "";
   });
   const [isSelectProductModalOpen, setIsSelectProductModalOpen] = useState(false);
+  const [searchProductQuery, setSearchProductQuery] = useState("");
+
+  const favoritedProducts = React.useMemo(() => {
+    try {
+      const favIds = JSON.parse(localStorage.getItem('shopspy_favorites') || '[]');
+      return products.filter(p => favIds.includes(p.id));
+    } catch { return []; }
+  }, []);
+
+  const filteredProducts = React.useMemo(() => {
+    if (!searchProductQuery.trim()) return favoritedProducts;
+    return favoritedProducts.filter(p => 
+      p.nome.toLowerCase().includes(searchProductQuery.toLowerCase()) ||
+      p.categoria.toLowerCase().includes(searchProductQuery.toLowerCase())
+    );
+  }, [favoritedProducts, searchProductQuery]);
 
   // New camera, influencer and avatar speech states
   const [isRegisteringCustomProduct, setIsRegisteringCustomProduct] = useState(false);
@@ -478,20 +493,20 @@ export default function FindGroup({ onNotification, product: propProduct, onNavi
   const allInfluencers = [...customAvatarsList, ...influencers];
 
   const [selectedCamera, setSelectedCamera] = useState(() => {
-    return localStorage.getItem('shopspy_findgroup_camera') || "frente";
+    return localStorage.getItem('shopspy_findgroup_camera') || "";
   });
   const [selectedInfluencer, setSelectedInfluencer] = useState<{ id: string; nome: string; genero: string; image: string } | null>(() => {
     const saved = localStorage.getItem('shopspy_findgroup_influencer');
-    return saved ? JSON.parse(saved) : { id: 'h1', nome: 'Lucas', genero: 'Homem', image: 'https://i.postimg.cc/Pv4T3fNK/Full-body-portrait-of-a-202606111328.jpg' };
+    return saved ? JSON.parse(saved) : null;
   });
   const [selectedTone, setSelectedTone] = useState(() => {
-    return localStorage.getItem('shopspy_findgroup_tone') || "Animado";
+    return localStorage.getItem('shopspy_findgroup_tone') || "";
   });
   const [selectedVoiceType, setSelectedVoiceType] = useState(() => {
-    return localStorage.getItem('shopspy_findgroup_voice_type') || "Feminina";
+    return localStorage.getItem('shopspy_findgroup_voice_type') || "";
   });
   const [selectedTonality, setSelectedTonality] = useState(() => {
-    return localStorage.getItem('shopspy_findgroup_tonality') || "Médio";
+    return localStorage.getItem('shopspy_findgroup_tonality') || "";
   });
   const [customSpeech, setCustomSpeech] = useState(() => {
     return localStorage.getItem('shopspy_findgroup_speech') || "";
@@ -623,6 +638,16 @@ export default function FindGroup({ onNotification, product: propProduct, onNavi
       onNotification("Erro na IA. Geramos uma fala padrão otimizada para o produto! 👍");
     } finally {
       setIsGeneratingSpeech(false);
+    }
+  };
+
+  const generateMergePrompt = (productImg: string, avatarImg: string) => {
+    return `Merge these two images: 1. Product Image: ${productImg} 2. Avatar Image: ${avatarImg}. Maintain high consistency for both. Cinematic lighting, professional product photography.`;
+  };
+
+  const handleDownloadAvatar = () => {
+    if (selectedInfluencer?.image) {
+      window.open(selectedInfluencer.image, '_blank');
     }
   };
 
@@ -980,15 +1005,39 @@ export default function FindGroup({ onNotification, product: propProduct, onNavi
                       </div>
                       <div className="space-y-1">
                         <label className="text-[10px] font-bold text-neutral-400 dark:text-white/40 uppercase tracking-wide">
-                          URL da Imagem do Produto (Opcional)
+                          Selecione uma imagem para o Produto *
                         </label>
-                        <input
-                          type="text"
-                          placeholder="Ex: https://link-da-imagem.com/foto.jpg"
-                          value={customProductImage}
-                          onChange={(e) => setCustomProductImage(e.target.value)}
-                          className="w-full bg-neutral-50 dark:bg-white/[0.02] border border-neutral-300 dark:border-white/[0.08] rounded-xl p-3 text-xs font-bold focus:outline-none focus:border-[#D0011B] focus:ring-1 focus:ring-[#D0011B]/40 text-gray-900 dark:text-white transition-all"
-                        />
+                        <div 
+                          onClick={() => {
+                            const input = document.createElement('input');
+                            input.type = 'file';
+                            input.accept = 'image/*';
+                            input.onchange = (e: any) => {
+                              const file = e.target.files[0];
+                              if (file) {
+                                const reader = new FileReader();
+                                reader.onloadend = () => {
+                                  setCustomProductImage(reader.result as string);
+                                };
+                                reader.readAsDataURL(file);
+                              }
+                            };
+                            input.click();
+                          }}
+                          className="w-full bg-neutral-50 dark:bg-white/[0.02] border-2 border-dashed border-neutral-300 dark:border-white/[0.08] rounded-xl p-3 text-xs font-bold text-gray-400 dark:text-white/30 cursor-pointer hover:border-[#D0011B] transition-all flex items-center justify-center gap-2"
+                        >
+                          {customProductImage ? (
+                            <div className="flex items-center gap-2 text-green-500">
+                              <CheckCircle2 size={14} />
+                              <span className="truncate max-w-[120px]">Imagem selecionada</span>
+                            </div>
+                          ) : (
+                            <>
+                              <Upload size={14} />
+                              <span>Escolher Arquivo</span>
+                            </>
+                          )}
+                        </div>
                       </div>
                     </div>
                     <div className="flex justify-end gap-2.5 pt-1">
@@ -1009,42 +1058,49 @@ export default function FindGroup({ onNotification, product: propProduct, onNavi
                 )}
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-[300px] overflow-y-auto custom-scrollbar pr-1">
-                  {products.map((p) => {
-                    const isSelected = selectedProduct?.id === p.id;
-                    return (
-                      <div
-                        key={p.id}
-                        onClick={() => setSelectedProduct(p)}
-                        className={`p-3 rounded-[12px] cursor-pointer transition-all border flex items-center gap-3 relative overflow-hidden ${
-                          isSelected 
-                            ? 'border-[#D0011B] bg-[#D0011B]/[0.06]' 
-                            : 'border-neutral-200 dark:border-white/[0.06] hover:border-neutral-300 dark:hover:border-white/10 bg-transparent'
-                        }`}
-                      >
-                        <div className="w-[44px] h-[44px] rounded-lg overflow-hidden flex-shrink-0 border border-black/10 dark:border-white/10">
-                          <img 
-                            src={p.imagem} 
-                            alt={p.nome} 
-                            className="w-full h-full object-cover" 
-                            referrerPolicy="no-referrer"
-                          />
+                  {favoritedProducts.length === 0 ? (
+                    <div className="col-span-2 py-10 flex flex-col items-center justify-center text-center space-y-3 opacity-40">
+                      <Heart size={32} />
+                      <p className="text-sm font-bold">Nenhum produto favorito encontrado.</p>
+                    </div>
+                  ) : (
+                    favoritedProducts.map((p) => {
+                      const isSelected = selectedProduct?.id === p.id;
+                      return (
+                        <div
+                          key={p.id}
+                          onClick={() => setSelectedProduct(p)}
+                          className={`p-3 rounded-[12px] cursor-pointer transition-all border flex items-center gap-3 relative overflow-hidden ${
+                            isSelected 
+                              ? 'border-[#D0011B] bg-[#D0011B]/[0.06]' 
+                              : 'border-neutral-200 dark:border-white/[0.06] hover:border-neutral-300 dark:hover:border-white/10 bg-transparent'
+                          }`}
+                        >
+                          <div className="w-[44px] h-[44px] rounded-lg overflow-hidden flex-shrink-0 border border-black/10 dark:border-white/10">
+                            <img 
+                              src={p.imagem} 
+                              alt={p.nome} 
+                              className="w-full h-full object-cover" 
+                              referrerPolicy="no-referrer"
+                            />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <div className="text-xs font-bold text-gray-900 dark:text-white truncate leading-tight">
+                              {p.nome}
+                            </div>
+                            <div className="text-[10px] uppercase font-bold text-gray-400 dark:text-white/40 mt-1">
+                              {p.categoria} · {p.preco}
+                            </div>
+                          </div>
+                          {isSelected && (
+                            <div className="w-5 h-5 rounded-full bg-[#D0011B] flex items-center justify-center text-white text-[10px] font-bold shrink-0">
+                              ✓
+                            </div>
+                          )}
                         </div>
-                        <div className="min-w-0 flex-1">
-                          <div className="text-xs font-bold text-gray-900 dark:text-white truncate leading-tight">
-                            {p.nome}
-                          </div>
-                          <div className="text-[10px] uppercase font-bold text-gray-400 dark:text-white/40 mt-1">
-                            {p.categoria} · {p.preco}
-                          </div>
-                        </div>
-                        {isSelected && (
-                          <div className="w-5 h-5 rounded-full bg-[#D0011B] flex items-center justify-center text-white text-[10px] font-bold shrink-0">
-                            ✓
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
+                      );
+                    })
+                  )}
                 </div>
 
                 <div className="flex justify-between items-center pt-4 border-t border-black/[0.06] dark:border-white/[0.06]">
@@ -1385,7 +1441,7 @@ export default function FindGroup({ onNotification, product: propProduct, onNavi
                     </div>
                   )}
 
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 max-h-[420px] overflow-y-auto custom-scrollbar pr-1 py-1">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 max-h-[420px] overflow-y-auto custom-scrollbar pr-1 py-1" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))' }}>
                     {allInfluencers
                       .filter((inf) => {
                         if (influencerGenderFilter === 'Homens') return inf.genero === 'Homem';
@@ -1404,12 +1460,13 @@ export default function FindGroup({ onNotification, product: propProduct, onNavi
                                 : 'border-neutral-200/80 dark:border-white/[0.06] bg-neutral-50/20 dark:bg-white/[0.01] hover:bg-neutral-50/70 dark:hover:bg-white/[0.03] hover:border-neutral-300 dark:hover:border-white/15 shadow-sm hover:scale-[1.01]'
                             }`}
                           >
-                            <div className="aspect-[4/5] rounded-xl overflow-hidden border border-black/[0.08] dark:border-white/[0.08] bg-neutral-100 dark:bg-white/5 relative">
+                            <div className="aspect-[3/4] rounded-xl overflow-hidden border border-black/[0.08] dark:border-white/[0.08] bg-neutral-100 dark:bg-white/5 relative">
                               <img
                                 src={inf.image}
                                 alt={inf.nome}
                                 className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover/avatar:scale-110"
                                 referrerPolicy="no-referrer"
+                                style={{ imageRendering: 'high-quality', objectPosition: 'top center' }}
                               />
                               <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent opacity-60 pointer-events-none" />
                             </div>
@@ -2009,7 +2066,7 @@ export default function FindGroup({ onNotification, product: propProduct, onNavi
                     <button
                       onClick={downloadProductImage}
                       disabled={isDownloadingImage}
-                      className="btn-custom !py-2.5 !px-5 !text-xs font-black tracking-wide relative overflow-hidden flex items-center gap-1.5 disabled:opacity-50"
+                      className="w-full sm:w-auto bg-[#D0011B] hover:bg-[#D0011B]/95 disabled:opacity-50 text-white font-bold py-2.5 px-6 rounded-full transition-all duration-200 active:scale-[0.98] flex items-center justify-center gap-2 text-xs shadow-lg shadow-[#D0011B]/20 cursor-pointer"
                     >
                       {isDownloadingImage ? (
                         <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -2024,12 +2081,13 @@ export default function FindGroup({ onNotification, product: propProduct, onNavi
                 {/* 6.1b: Avatar Referência Card */}
                 {selectedInfluencer && (
                   <div className="bg-white dark:bg-[#111111] border border-black/5 dark:border-white/[0.08] rounded-2xl p-5 shadow-lg flex flex-col sm:flex-row items-center gap-6">
-                    <div className="w-[124px] h-[124px] rounded-xl overflow-hidden border border-black/10 dark:border-white/10 shadow-sm bg-neutral-100 dark:bg-white/5 flex-shrink-0">
+                    <div className="w-[120px] h-[160px] rounded-xl overflow-hidden border border-black/10 dark:border-white/10 shadow-sm bg-neutral-100 dark:bg-white/5 flex-shrink-0">
                       <img 
                         src={selectedInfluencer.image} 
                         alt={selectedInfluencer.nome} 
                         className="w-full h-full object-cover"
                         referrerPolicy="no-referrer"
+                        style={{ imageRendering: 'high-quality', objectPosition: 'top center' }}
                       />
                     </div>
                     <div className="flex-1 space-y-4 w-full">
@@ -2046,18 +2104,35 @@ export default function FindGroup({ onNotification, product: propProduct, onNavi
                       </div>
                       
                       <button
-                        onClick={downloadInfluencerImage}
-                        disabled={isDownloadingAvatar}
-                        className="btn-custom !py-2.5 !px-5 !text-xs font-black tracking-wide relative overflow-hidden flex items-center gap-1.5 disabled:opacity-50"
+                        onClick={handleDownloadAvatar}
+                        className="w-full sm:w-auto bg-[#D0011B] hover:bg-[#D0011B]/95 text-white font-bold py-2.5 px-6 rounded-full transition-all duration-200 active:scale-[0.98] flex items-center justify-center gap-2 text-xs shadow-lg shadow-[#D0011B]/20 cursor-pointer"
                       >
-                        {isDownloadingAvatar ? (
-                          <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                        ) : (
-                          <Download size={13} />
-                        )}
-                        <span>{isDownloadingAvatar ? 'Baixando...' : 'Baixar Imagem do Avatar'}</span>
+                        <Download size={13} />
+                        <span>Baixar Avatar</span>
                       </button>
                     </div>
+                  </div>
+                )}
+
+                {/* 6.1c: Prompt para Mesclar Imagens Card */}
+                {selectedProduct && selectedInfluencer && (
+                  <div className="bg-white dark:bg-[#111111] border border-black/5 dark:border-white/[0.08] rounded-2xl p-5 shadow-lg space-y-4">
+                    <span className="text-[9px] font-black tracking-[0.1em] bg-indigo-600/10 text-indigo-500 px-2 py-1 rounded uppercase">
+                      Prompt para Mesclar Imagens (IA)
+                    </span>
+                    <div className="text-[11px] leading-relaxed text-gray-700 dark:text-white/80 bg-gray-50 dark:bg-[#0a0a0a] rounded-lg p-4 whitespace-pre-wrap border border-black/5 dark:border-white/5 font-mono">
+                      {generateMergePrompt(selectedProduct.imagem, selectedInfluencer.image)}
+                    </div>
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(generateMergePrompt(selectedProduct.imagem, selectedInfluencer.image));
+                        onNotification("Prompt de mesclagem copiado! 📋");
+                      }}
+                      className="btn-custom w-full !py-2.5 !px-5 !text-xs font-black tracking-wide relative overflow-hidden flex items-center justify-center gap-1.5"
+                    >
+                      <Copy size={13} />
+                      <span>Copiar Prompt de Mescla</span>
+                    </button>
                   </div>
                 )}
 
@@ -2252,52 +2327,62 @@ export default function FindGroup({ onNotification, product: propProduct, onNavi
                   Escolha um dos {products.length} produtos de alta conversão:
                 </p>
                 <div className="grid grid-cols-1 gap-2.5">
-                  {products.map((p) => {
-                    const isSelected = selectedProduct?.id === p.id;
-                    return (
-                      <div
-                        key={p.id}
-                        onClick={() => {
-                          setSelectedProduct(p);
-                          setIsSelectProductModalOpen(false);
-                          onNotification(`Produto "${p.nome}" selecionado! 📦`);
-                        }}
-                        className={`p-3 rounded-xl cursor-pointer transition-all border flex items-center justify-between gap-3 ${
-                          isSelected
-                            ? 'border-[#D0011B] bg-[#D0011B]/[0.05]'
-                            : 'border-neutral-200 dark:border-white/[0.04] bg-neutral-50/50 dark:bg-white/[0.01] hover:border-neutral-300 dark:hover:border-white/10'
-                        }`}
-                      >
-                        <div className="flex items-center gap-3 min-w-0">
-                          <div className="w-[48px] h-[48px] rounded-lg overflow-hidden flex-shrink-0 border border-black/5">
-                            <img
-                              src={p.imagem}
-                              alt={p.nome}
-                              className="w-full h-full object-cover"
-                              referrerPolicy="no-referrer"
-                            />
+                  {favoritedProducts.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-12 border-2 border-dashed border-black/5 dark:border-white/5 rounded-2xl bg-neutral-50/50 dark:bg-white/[0.01]">
+                      <Heart size={32} className="text-gray-300 dark:text-white/10 mb-3" />
+                      <p className="text-xs font-bold text-gray-400 dark:text-white/30 text-center">
+                        Você ainda não tem produtos favoritos.
+                      </p>
+                    </div>
+                  ) : filteredProducts.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-10 text-gray-400 dark:text-white/30 font-bold text-xs">
+                      Nenhum favorito encontrado para "{searchProductQuery}"
+                    </div>
+                  ) : (
+                    filteredProducts.map((p) => {
+                      const isSelected = selectedProduct?.id === p.id;
+                      return (
+                        <div
+                          key={p.id}
+                          onClick={() => {
+                            setSelectedProduct(p);
+                            setIsSelectProductModalOpen(false);
+                            onNotification(`Produto "${p.nome}" selecionado! 📦`);
+                          }}
+                          className={`p-3 rounded-xl cursor-pointer transition-all border flex items-center justify-between gap-3 ${
+                            isSelected
+                              ? 'border-[#D0011B] bg-[#D0011B]/[0.05]'
+                              : 'border-neutral-200 dark:border-white/[0.04] bg-neutral-50/50 dark:bg-white/[0.01] hover:border-neutral-300 dark:hover:border-white/10'
+                          }`}
+                        >
+                          <div className="flex items-center gap-3 min-w-0">
+                            <div className="w-[48px] h-[48px] rounded-lg overflow-hidden flex-shrink-0 border border-black/5">
+                              <img
+                                src={p.imagem}
+                                alt={p.nome}
+                                className="w-full h-full object-cover"
+                                referrerPolicy="no-referrer"
+                              />
+                            </div>
+                            <div className="min-w-0">
+                              <h4 className="text-xs font-bold text-gray-900 dark:text-white truncate">
+                                {p.nome}
+                              </h4>
+                              <p className="text-[10px] text-gray-400 dark:text-white/40 mt-1 font-semibold uppercase tracking-wider">
+                                Categoria: {p.categoria}
+                              </p>
+                            </div>
                           </div>
-                          <div className="min-w-0">
-                            <h4 className="text-xs font-bold text-gray-900 dark:text-white truncate">
-                              {p.nome}
-                            </h4>
-                            <p className="text-[10px] text-gray-400 dark:text-white/40 mt-1 font-semibold uppercase tracking-wider">
-                              Categoria: {p.categoria}
-                            </p>
-                          </div>
-                        </div>
 
-                        <div className="text-right shrink-0">
-                          <span className="text-[11px] font-black text-[#D0011B]">
-                            {p.preco}
-                          </span>
-                          <span className="text-[9px] text-gray-400 block font-medium">
-                            {p.vendas} vendidos
-                          </span>
+                          <div className="text-right shrink-0">
+                            <span className="text-[11px] font-black text-[#D0011B]">
+                              {p.preco}
+                            </span>
+                          </div>
                         </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })
+                  )}
                 </div>
               </div>
             </motion.div>
