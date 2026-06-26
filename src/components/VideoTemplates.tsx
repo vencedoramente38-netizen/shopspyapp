@@ -34,6 +34,8 @@ import {
 import { motion, AnimatePresence } from 'motion/react';
 import { products as initialProducts } from '../data/products';
 import { Product } from '../types';
+import { CopyButton } from './ui/CopyButton';
+import { ErrorBoundary } from './ui/ErrorBoundary';
 
 interface VideoTemplatesProps {
   onNotification: (msg: string) => void;
@@ -64,7 +66,15 @@ interface Scenario {
   description: string;
 }
 
-export default function VideoTemplates({ onNotification, selectedDefaultProduct }: VideoTemplatesProps) {
+export default function VideoTemplates(props: VideoTemplatesProps) {
+  return (
+    <ErrorBoundary>
+      <VideoTemplatesInternal {...props} />
+    </ErrorBoundary>
+  );
+}
+
+function VideoTemplatesInternal({ onNotification, selectedDefaultProduct }: VideoTemplatesProps) {
   // Templates configuration
   const templates: Template[] = [
     {
@@ -122,6 +132,7 @@ export default function VideoTemplates({ onNotification, selectedDefaultProduct 
   const [configStep, setConfigStep] = useState<1 | 2 | 3 | 4>(1);
   const [loaderProgress, setLoaderProgress] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+  const [runtimeError, setRuntimeError] = useState<string | null>(null);
   
   const [searchProductQuery, setSearchProductQuery] = useState('');
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -140,6 +151,30 @@ export default function VideoTemplates({ onNotification, selectedDefaultProduct 
   // New IA Speech States
   const [speechText, setSpeechText] = useState('');
   const [isGeneratingSpeech, setIsGeneratingSpeech] = useState(false);
+
+  // Safe product selection handler
+  const handleSelectProduct = (product: Product) => {
+    try {
+      setSelectedProduct(product);
+      setIsCustomProductMode(false);
+      setCustomProductImage(null);
+      setStep('config');
+      setConfigStep(1);
+    } catch (err) {
+      console.error('Erro ao selecionar produto:', err);
+      setRuntimeError('Erro ao selecionar produto. Tente novamente.');
+    }
+  };
+
+  // Safe avatar selection handler
+  const handleSelectAvatar = (avatar: Avatar) => {
+    try {
+      setSelectedAvatar(avatar);
+    } catch (err) {
+      console.error('Erro ao selecionar avatar:', err);
+      setRuntimeError('Erro ao selecionar avatar. Tente novamente.');
+    }
+  };
 
   // FAVORITOS + BUSCA logic
   const getFavoritedProducts = (): Product[] => {
@@ -330,8 +365,11 @@ export default function VideoTemplates({ onNotification, selectedDefaultProduct 
   const generatedData = useMemo(() => {
     if (!selectedTemplate || !selectedProduct) return { englishPrompt: '' };
 
-    const cleanProductName = selectedProduct.nome;
-    const shortCategory = selectedProduct.categoria;
+    const cleanProductName = selectedProduct.nome || 'Produto';
+    const shortCategory = selectedProduct.categoria || 'Geral';
+    const avatarNome = selectedAvatar?.nome || 'Modelo';
+    const avatarStyle = selectedAvatar?.style || 'Professional model, stylish outfit';
+    const avatarGenero = selectedAvatar?.genero || 'model';
 
     let templateEnglishDesc = '';
     if (selectedTemplate.id === 'frente-corpo-todo') {
@@ -350,12 +388,12 @@ export default function VideoTemplates({ onNotification, selectedDefaultProduct 
 - Resolution & Quality: Real-world photorealistic 8K UHD, premium commercial cinematic grading, studio-caliber rendering, 60fps luxury look.
 
 [MODEL / AVATAR PRESENTATION]:
-- Name & Tone: ${selectedAvatar.nome}.
-- Style Description: ${selectedAvatar.style}.
+- Name & Tone: ${avatarNome}.
+- Style Description: ${avatarStyle}.
 - Visuals: Perfect symmetrical facial features, neat modern styling, highly expressive talking-to-camera presentation, charismatic and welcoming smile, natural fluid body gestures.
 
 [ENVIRONMENT & SCENARIO]:
-- Scene setting: ${selectedScenario?.id === 'personalized' ? 'Custom Scenario' : selectedScenario?.name}. Detailed description: ${selectedScenario?.id === 'personalized' ? customScenarioText : selectedScenario?.description}.
+- Scene setting: ${selectedScenario?.id === 'personalized' ? 'Custom Scenario' : (selectedScenario?.name || 'Studio')}. Detailed description: ${selectedScenario?.id === 'personalized' ? customScenarioText : (selectedScenario?.description || 'Clean studio background')}.
 - Lighting: Professional studio key lights, soft ambient fill, warm rim lighting accents, gorgeous realistic background bokeh, accurate soft shadows.
 
 [PRODUCT INTEGRATION & SALES CTAs]:
@@ -368,7 +406,7 @@ export default function VideoTemplates({ onNotification, selectedDefaultProduct 
     const mergePrompt = `You have two separate images that need to be merged into one seamless professional photo:
 
 IMAGE A: A product photo of "${cleanProductName}"
-IMAGE B: A full body photo of a person (${selectedAvatar?.genero || 'model'} named ${selectedAvatar?.nome || 'model'})
+IMAGE B: A full body photo of a person (${avatarGenero} named ${avatarNome})
 
 MERGE TASK:
 Place the person from Image B naturally holding, wearing or interacting with the product from Image A.
@@ -435,6 +473,13 @@ OUTPUT FORMAT: Single JPG image, 9:16 aspect ratio.`;
 
   return (
     <div className="flex-1 w-full max-w-[1240px] mx-auto px-4 py-6 md:py-8 select-none transition-colors duration-300">
+      {/* Error boundary UI */}
+      {runtimeError && (
+        <div className="mb-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl flex items-center justify-between gap-3">
+          <span className="text-xs font-bold text-red-600 dark:text-red-400">{runtimeError}</span>
+          <button onClick={() => setRuntimeError(null)} className="text-red-400 hover:text-red-600 text-xs font-black px-2 py-1 rounded">✕ Fechar</button>
+        </div>
+      )}
       
       {/* Dynamic Header */}
       <div className="mb-6 md:mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-black/5 dark:border-white/[0.06] pb-5">
@@ -776,7 +821,7 @@ OUTPUT FORMAT: Single JPG image, 9:16 aspect ratio.`;
                                         comissao: 'R$ 0,00',
                                         categoria: 'Customizado'
                                       };
-                                      setSelectedProduct(newProd);
+                                      handleSelectProduct(newProd);
                                     };
                                     reader.readAsDataURL(file);
                                   }
@@ -843,11 +888,11 @@ OUTPUT FORMAT: Single JPG image, 9:16 aspect ratio.`;
 
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 max-h-[480px] overflow-y-auto custom-scrollbar pr-1 pb-2">
                       {filteredAvatars.map((av) => {
-                        const isSelected = selectedAvatar.id === av.id;
+                        const isSelected = selectedAvatar?.id === av.id;
                         return (
                           <div 
                             key={av.id}
-                            onClick={() => setSelectedAvatar(av)}
+                            onClick={() => handleSelectAvatar(av)}
                             className={`flex flex-col p-3 rounded-[16px] cursor-pointer transition-all border relative overflow-hidden group/card shadow-xs hover:shadow-md ${
                               isSelected 
                                 ? 'border-[#D0011B] bg-[#D0011B]/[0.06] shadow-[#D0011B]/10' 
@@ -1141,20 +1186,22 @@ OUTPUT FORMAT: Single JPG image, 9:16 aspect ratio.`;
 
             {/* Descrição do Produto Card */}
             <div className="bg-white dark:bg-[#111111] border border-black/5 dark:border-white/[0.08] rounded-2xl p-5 shadow-lg space-y-4">
-              <div className="flex justify-between items-start">
-                <span className="text-[9px] font-black tracking-[0.1em] bg-emerald-600/10 text-emerald-500 px-2 py-1 rounded uppercase">
-                  Descrição do Produto (Copy)
-                </span>
-                <button 
-                  onClick={() => handleCopyToClipboard(generatedData.productDescription!, "Copy de Vendas")}
-                  className="flex items-center gap-1.5 px-3 py-1 bg-neutral-100 dark:bg-white/[0.05] rounded-lg text-[10px] font-bold text-gray-600 dark:text-white/60 hover:text-[#D0011B] transition-colors"
-                >
-                  <Copy size={12} />
-                  <span>Copiar Copy</span>
-                </button>
-              </div>
-              <div className="p-4 bg-neutral-50 dark:bg-black/20 rounded-xl border border-black/5 dark:border-white/5 text-[11px] leading-relaxed text-gray-600 dark:text-white/60 whitespace-pre-wrap">
-                {generatedData.productDescription}
+              <span className="text-[9px] font-black tracking-[0.1em] bg-emerald-600/10 text-emerald-500 px-2 py-1 rounded uppercase">
+                Descrição do Produto — APENAS O NOME
+              </span>
+              <div>
+                <p style={{ fontSize: 14, fontWeight: 600, color: 'white', marginBottom: 4 }}>
+                  {selectedProduct?.nome}
+                </p>
+                <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                  <span style={{ color: '#D0011B', fontWeight: 700, fontSize: 14 }}>{selectedProduct?.preco}</span>
+                  <span style={{ background: 'rgba(208,1,27,0.1)', color: '#D0011B', borderRadius: 9999, padding: '2px 8px', fontSize: 11, fontWeight: 700 }}>
+                    {selectedProduct?.comissao} comissão
+                  </span>
+                </div>
+                <div className="mt-2 flex justify-start">
+                  <CopyButton value={selectedProduct?.nome || ''} />
+                </div>
               </div>
             </div>
 

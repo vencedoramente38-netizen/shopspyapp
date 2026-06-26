@@ -26,7 +26,6 @@ export default function Login({ onLogin, onBack }: LoginProps) {
 
     // 0. LOCAL LOGIN FALLBACKS (Garante acesso contínuo mesmo com problemas no Supabase)
     const normalizedEmail = email.toLowerCase().trim();
-    const isWildcardPassword = password === 'shopspy12345';
     
     // Local accounts list
     const localAccounts = [
@@ -37,7 +36,7 @@ export default function Login({ onLogin, onBack }: LoginProps) {
     ];
 
     // Check local accounts first
-    const localMatch = localAccounts.find(acc => acc.email === normalizedEmail && (acc.password === password || isWildcardPassword));
+    const localMatch = localAccounts.find(acc => acc.email === normalizedEmail && acc.password === password);
     if (localMatch) {
       localStorage.setItem('shopspy_auth', 'true');
       localStorage.setItem('shopspy_plan', localMatch.plan);
@@ -47,15 +46,6 @@ export default function Login({ onLogin, onBack }: LoginProps) {
       return;
     }
 
-    // Wildcard password: any valid email with shopspy12345 gets access
-    if (isWildcardPassword && normalizedEmail.includes('@')) {
-      localStorage.setItem('shopspy_auth', 'true');
-      localStorage.setItem('shopspy_plan', 'vitalicio');
-      localStorage.setItem('shopspy_is_admin', 'false');
-      localStorage.setItem('shopspy_user_email', normalizedEmail);
-      onLogin();
-      return;
-    }
 
     try {
       const { data, error: authError } = await supabase.auth.signInWithPassword({

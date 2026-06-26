@@ -232,31 +232,40 @@ export default function Dashboard({ products: productsProp, isDarkMode = true }:
   // Live notification Listener for sales event
   useEffect(() => {
     const handleSale = (e: any) => {
-      const { price, productId } = e.detail;
-      const product = activeProducts.find(p => p.id === productId);
-      if (!product) return;
+      const { price, commissionRate, productId } = e.detail;
+      const commission = price * (commissionRate / 100);
 
-      // Add to recent sales list
-      setRecentSales(prev => [{
-        id: Date.now(),
-        product,
-        price,
-        time: new Date().toLocaleTimeString('pt-BR'),
-        timestamp: Date.now()
-      }, ...prev].slice(0, 10));
+      // Use userStorage para manter consistência entre páginas
+      if (userStorage) {
+        const currentSales = userStorage.get('TotalVendas') || 0;
+        const currentRevenue = userStorage.get('ReceitaTotal') || 0;
+        const currentCommission = userStorage.get('ComissaoEstimada') || 0;
+        const currentItems = userStorage.get('ItensSold') || 0;
+        const currentClicks = userStorage.get('Cliques') || 0;
 
-      const commRateStr = product.comissao ? String(product.comissao).replace('%', '').trim() : '10';
-      const commRate = parseFloat(commRateStr) / 100;
-      const commission = price * (isNaN(commRate) ? 0.1 : commRate);
+        userStorage.set('TotalVendas', currentSales + 1);
+        userStorage.set('ReceitaTotal', currentRevenue + price);
+        userStorage.set('ComissaoEstimada', currentCommission + commission);
+        userStorage.set('ItensSold', currentItems + 1);
+        userStorage.set('Cliques', currentClicks + Math.floor(Math.random() * 5 + 1));
+      }
 
+      // Forçar atualização local dos states se o componente estiver montado
       setSalesTotal(prev => prev + price);
-      setCommissionTotal(prev => prev + commission);
       setOrders(prev => prev + 1);
-      
-      // Update auxiliary indicators 
-      setVisitors(prev => prev + Math.floor(Math.random() * 8 + 3));
-      setViews(prev => prev + Math.floor(Math.random() * 15 + 5));
       setUnits(prev => prev + 1);
+      setCommissionTotal(prev => prev + commission);
+      
+      const product = activeProducts.find(p => p.id === productId);
+      if (product) {
+        setRecentSales(prev => [{
+          id: Date.now(),
+          product,
+          price,
+          time: new Date().toLocaleTimeString('pt-BR'),
+          timestamp: Date.now()
+        }, ...prev].slice(0, 10));
+      }
     };
 
     window.addEventListener('shopspy_sale', handleSale as EventListener);

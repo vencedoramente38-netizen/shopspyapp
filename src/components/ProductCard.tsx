@@ -142,22 +142,7 @@ export default function ProductCard({
         </div>
 
         {/* Botões Analisar & Afiliar-se */}
-        <div className="grid grid-cols-2 gap-2 mt-auto">
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              if (setSelectedProductForExtraction) {
-                setSelectedProductForExtraction(product);
-              }
-              if (setActiveTab) {
-                setActiveTab('encontrar-grupo');
-              }
-            }}
-            className="btn-custom w-full !py-2 !px-2.5 !text-[11px] font-bold tracking-wide !rounded-lg flex items-center justify-center gap-1.5 select-none"
-          >
-            <Users size={12} />
-            <span>Vender</span>
-          </button>
+        <div className="grid grid-cols-1 gap-2 mt-auto">
           
           <button 
             onClick={(e) => {
