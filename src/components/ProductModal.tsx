@@ -112,6 +112,12 @@ export default function ProductModal({ product, isOpen, onClose }: ProductModalP
                     <CopyButton value={product.nome} size={12} />
                   </div>
                 </div>
+
+                {product.copyVenda && (
+                  <p className="text-[11px] text-gray-500 dark:text-white/50 leading-relaxed mt-1 italic line-clamp-2">
+                    "{product.copyVenda}"
+                  </p>
+                )}
                 
                 <div className="flex items-center gap-2 mt-2">
                   <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-white/60">

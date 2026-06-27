@@ -21,7 +21,8 @@ import {
   Settings,
   Target,
   Sparkles,
-  DollarSign
+  DollarSign,
+  Heart
 } from 'lucide-react';
 import { Sparkles as SparklesParticles } from './Sparkles';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -714,106 +715,21 @@ export default function LandingPage({ onEnterLogin }: LandingPageProps) {
           />
         </div>
 
-        {/* Top announcement badge */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8 select-none">
-          <motion.div 
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-            className="inline-flex items-center gap-2 border border-[#D0011B]/20 rounded-full px-4 py-1.5 text-[11px] sm:text-[12px] text-[#D0011B] bg-[#D0011B]/5 font-bold tracking-wide"
-          >
-            🛍️ A ferramenta nº 1 para Shopee
-          </motion.div>
-
-          {/* Social Proof Trust Badge */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: -10 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            transition={{ duration: 0.75, delay: 0.05, ease: [0.16, 1, 0.3, 1] }}
-            className="inline-flex items-center gap-2.5 bg-[#FFDFE7]/25 border border-[#D0011B]/15 rounded-full py-1 pl-1 pr-3.5 hover:bg-[#FFDFE7]/40 transition-all duration-300 shadow-[0_4px_18px_rgba(208,1,27,0.01)] cursor-default"
-          >
-            <div className="bg-gradient-to-r from-[#D0011B] to-[#ec1e54] rounded-full py-0.5 px-2 flex -space-x-1.5 items-center">
-              <img 
-                src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=80&q=80" 
-                alt="Seller 1" 
-                className="w-5 h-5 rounded-full object-cover border border-white shrink-0 shadow-sm" 
-                referrerPolicy="no-referrer"
-              />
-              <img 
-                src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=80&q=80" 
-                alt="Seller 2" 
-                className="w-5 h-5 rounded-full object-cover border border-white shrink-0 shadow-sm" 
-                referrerPolicy="no-referrer"
-              />
-              <img 
-                src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=80&q=80" 
-                alt="Seller 3" 
-                className="w-5 h-5 rounded-full object-cover border border-white shrink-0 shadow-sm" 
-                referrerPolicy="no-referrer"
-              />
-            </div>
-            <span className="text-[11px] sm:text-[12px] font-extrabold text-[#8A0012] font-sans tracking-tight">
-              + 3.000 Sellers que confiam em nós!
-            </span>
-          </motion.div>
-        </div>
-
-        {/* Main H1 heading title */}
-        <motion.h1 
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-          className="text-[48px] sm:text-[68px] md:text-[80px] font-black leading-[1.02] mb-6 tracking-tighter text-[#111111]"
+        {/* Main Hero Banner Image */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          className="relative w-full max-w-[900px] mx-auto rounded-[32px] overflow-hidden shadow-[0_24px_80px_rgba(208,1,27,0.12)] border border-[#D0011B]/10"
         >
-          Domine a Shopee e <br />
-          <span className="text-[#D0011B]">Fature Alto Todos os Dias</span>
-        </motion.h1>
-
-        {/* Subtitle description copy */}
-        <motion.p 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-          className="text-[16px] sm:text-[18px] text-[#555555] max-w-[560px] mx-auto mb-10 leading-relaxed font-semibold"
-        >
-          Encontre os produtos mais vendidos, gere vídeos com IA e divulgue nos maiores grupos do Facebook. Tudo em um só lugar.
-        </motion.p>
-
-        {/* Interactive calls to action buttons */}
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-          className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-6 max-w-sm sm:max-w-none mx-auto"
-        >
-          <button 
-            onClick={() => scrollToSection('planos')}
-            className="btn-custom w-full sm:w-auto select-none"
-          >
-            <span>Quero acesso agora</span>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="5" y1="12" x2="19" y2="12"></line>
-              <polyline points="12 5 19 12 12 19"></polyline>
-            </svg>
-          </button>
-          <button 
-            onClick={() => scrollToSection('beneficios')}
-            className="w-full sm:w-auto bg-transparent border border-[#e5e5e5] hover:bg-neutral-50 text-[#111111] px-8 py-4 rounded-full text-[16px] font-bold transition-colors cursor-pointer select-none"
-          >
-            Ver funcionalidades
-          </button>
+          <img 
+            src="https://i.postimg.cc/B6NJvG7r/Cinematic-ultra-wide-hero-banner-image-202606262228.jpg" 
+            alt="ShopSpy Hero Banner" 
+            className="w-full h-auto object-cover"
+            referrerPolicy="no-referrer"
+          />
         </motion.div>
 
-        {/* Urgency guarantee badge */}
-        <div className="flex flex-col items-center gap-6">
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
-            className="inline-flex items-center bg-white/40 backdrop-blur-md border border-[#D0011B]/20 rounded-full px-5 py-2.5 text-[12px] sm:text-[13px] text-[#D0011B] font-extrabold shadow-[0_8px_32px_rgba(208,1,27,0.06)] select-none"
-          >
-            ⚡ Últimas vagas com desconto especial
-          </motion.div>
 
           {/* Operational Flow representation for Brands (Google, Shopee, Facebook) */}
           <motion.div
@@ -870,8 +786,7 @@ export default function LandingPage({ onEnterLogin }: LandingPageProps) {
                 </div>
               </div>
             </div>
-          </motion.div>
-        </div>
+        </motion.div>
       </header>
 
       {/* SAAS EXPERIENCE DEMONSTRATIVE PREVIEW */}
@@ -1255,17 +1170,28 @@ export default function LandingPage({ onEnterLogin }: LandingPageProps) {
                       <motion.div
                         initial={{ opacity: 0, y: 7, scale: 0.95 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
-                        className="mt-3.5 overflow-hidden rounded-2xl border border-[#D0011B]/15 bg-white/70 dark:bg-black/20 backdrop-blur-md py-2 px-3 flex items-center gap-2 select-none shadow-[0_4px_24px_rgba(208,1,27,0.03)]"
+                        className="mt-3.5 overflow-hidden rounded-2xl border border-[#D0011B]/15 bg-white/70 dark:bg-black/20 backdrop-blur-md py-3 px-4 flex flex-col gap-2 select-none shadow-[0_4px_24px_rgba(208,1,27,0.03)]"
                       >
-                        <div className="p-1 rounded-full bg-[#D0011B]/10 border border-[#D0011B]/20 shrink-0 flex items-center justify-center relative">
-                          <Gift className="text-[#D0011B] w-3.5 h-3.5" strokeWidth={2.5} />
+                        <div className="flex items-center gap-2">
+                          <div className="p-1 rounded-full bg-[#D0011B]/10 border border-[#D0011B]/20 shrink-0 flex items-center justify-center relative">
+                            <Gift className="text-[#D0011B] w-3.5 h-3.5" strokeWidth={2.5} />
+                          </div>
+                          <div className="flex-1 min-w-0 font-sans">
+                            <p className="text-[11px] sm:text-[12px] font-semibold text-neutral-600 dark:text-neutral-300 tracking-tight leading-normal">
+                              <span className="text-[#D0011B] font-extrabold tracking-tight">
+                                Desconto de 78%
+                              </span>{" "}
+                              aplicado pela indicação
+                            </p>
+                          </div>
                         </div>
-                        <div className="flex-1 min-w-0 font-sans">
-                          <p className="text-[11px] sm:text-[12px] font-semibold text-neutral-600 dark:text-neutral-300 tracking-tight leading-normal">
-                            <span className="text-[#D0011B] font-extrabold tracking-tight">
-                              Desconto de 78%
-                            </span>{" "}
-                            aplicado pela indicação
+                        
+                        <div className="flex items-start gap-2.5 pt-2 border-t border-dashed border-[#D0011B]/20">
+                          <div className="p-1 rounded-full bg-[#D0011B]/10 shrink-0 mt-0.5">
+                            <Heart className="text-[#D0011B] w-3 h-3 fill-[#D0011B]/20" />
+                          </div>
+                          <p className="text-[10px] sm:text-[11px] font-bold text-neutral-500 dark:text-neutral-400 leading-tight">
+                            O usuário que indicou <span className="text-[#D0011B]">abriu mão de qualquer recompensa</span> para destinar créditos infinitos à sua conta.
                           </p>
                         </div>
                       </motion.div>

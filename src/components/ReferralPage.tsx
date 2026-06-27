@@ -13,7 +13,8 @@ import {
   ArrowLeft, 
   Copy, 
   X,
-  Share2
+  Share2,
+  Plus
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -108,87 +109,113 @@ export default function ReferralPage({ isOpen, onClose, onNotification }: Referr
           className="w-full max-w-lg bg-white dark:bg-[#0e0f14] border border-neutral-200 dark:border-white/[0.08] rounded-2xl shadow-2xl relative overflow-hidden flex flex-col max-h-[90vh]"
           onClick={(e) => e.stopPropagation()}
         >
-          {/* Subtle Red radial gloss filter */}
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-80 h-32 bg-[#d0011b]/5 rounded-full blur-3xl pointer-events-none" />
+          {/* Redesigned Header with Gradient */}
+          <div className="relative bg-gradient-to-br from-[#D0011B] to-[#9B0014] pt-8 pb-10 px-6 overflow-hidden">
+            {/* Ambient effects */}
+            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -mr-10 -mt-10" />
+            <div className="absolute bottom-0 left-0 w-24 h-24 bg-black/10 rounded-full blur-xl -ml-10 -mb-10" />
+            
+            <div className="relative z-10 text-center space-y-3">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/15 backdrop-blur-md border border-white/20 text-white text-[10px] font-black uppercase tracking-widest shadow-sm">
+                <Sparkles size={11} className="text-white" />
+                <span>Indique e Ganhe</span>
+              </div>
+              
+              <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tighter leading-none mb-1">
+                {step === 'select' ? 'Expanda sua Rede' : step === 'presentear' ? 'Presentear Amigo' : 'Modo Lucrativo'}
+              </h2>
+              <p className="text-[11px] text-white/80 font-bold uppercase tracking-[0.15em] leading-none">
+                {step === 'select' ? 'Escolha sua estratégia de indicação' : 'Transforme conexões em resultados'}
+              </p>
+            </div>
 
-          {/* Close button */}
-          <button 
-            onClick={onClose}
-            className="absolute top-4 right-4 z-10 p-1.5 rounded-lg bg-neutral-100 dark:bg-white/5 hover:bg-neutral-200 dark:hover:bg-white/10 text-neutral-500 hover:text-neutral-900 dark:text-gray-400 dark:hover:text-white transition-colors cursor-pointer"
-          >
-            <X size={16} />
-          </button>
+            {/* Close button with better contrast */}
+            <button 
+              onClick={onClose}
+              className="absolute top-4 right-4 z-20 p-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white/80 hover:text-white transition-all cursor-pointer border border-white/10"
+            >
+              <X size={18} />
+            </button>
+          </div>
 
-          {/* Scrollable Container */}
-          <div className="p-6 overflow-y-auto custom-scrollbar space-y-6">
+          {/* Main content area with negative margin overlay */}
+          <div className="relative -mt-5 bg-white dark:bg-[#0e0f14] rounded-t-[24px] p-6 pt-8 space-y-6 overflow-y-auto custom-scrollbar flex-1">
             <AnimatePresence mode="wait">
               
               {/* STEP 1: CHOOSE INDICATION MODE */}
               {step === 'select' && (
                 <motion.div
                   key="select-screen"
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 10 }}
-                  className="space-y-6 pt-2"
+                  initial={{ opacity: 0, scale: 0.98 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.98 }}
+                  className="space-y-4"
                 >
-                  {/* Badge & Typography header */}
-                  <div className="text-center space-y-3">
-                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#d0011b]/10 border border-[#d0011b]/20 text-[#d0011b] text-[10px] font-black uppercase tracking-wider">
-                      <Share2 size={11} className="text-[#d0011b]" />
-                      <span>Escolha como quer indicar</span>
-                    </div>
+                  <p className="text-[10px] font-black text-neutral-400 dark:text-gray-500 uppercase tracking-widest block font-sans ml-1 text-center mb-5">
+                    Como você deseja proceder hoje?
+                  </p>
 
-                    <h2 className="text-2xl sm:text-3xl font-black tracking-tight gradient-title leading-none">
-                      Indique amigos
-                    </h2>
-                    <p className="text-[11px] text-neutral-500 dark:text-gray-400 font-bold max-w-sm mx-auto leading-relaxed uppercase tracking-wide">
-                      e escolha o que faz mais sentido para você
-                    </p>
-                  </div>
-
-                  {/* Body selection links */}
-                  <div className="space-y-3">
-                    <p className="text-[10px] font-black text-neutral-400 dark:text-gray-500 uppercase tracking-widest block font-sans">
-                      COMO VOCÊ QUER INDICAR?
-                    </p>
-
-                    {/* Button 1: QUERO LUCRAR COM A INDICAÇÃO */}
+                  <div className="grid grid-cols-1 gap-4">
+                    {/* Option 1: Lucrar */}
                     <button
                       onClick={() => setStep('lucrar')}
-                      className="w-full text-left bg-neutral-50 hover:bg-neutral-100/70 dark:bg-[#15161b] dark:hover:bg-[#1e1f26] border border-neutral-200 dark:border-white/[0.05] hover:border-[#d0011b]/30 dark:hover:border-[#d0011b]/30 rounded-xl p-4 flex items-center gap-4 transition-all duration-300 hover:scale-[1.005] cursor-pointer group"
+                      className="group relative flex flex-col p-5 bg-neutral-50 dark:bg-white/[0.02] border border-neutral-200 dark:border-white/[0.05] hover:border-[#D0011B]/40 rounded-2xl transition-all duration-300 hover:shadow-[0_12px_32px_rgba(208,1,27,0.08)] cursor-pointer overflow-hidden"
                     >
-                      <div className="w-11 h-11 rounded-xl bg-[#d0011b]/10 border border-[#d0011b]/20 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                        <TrendingUp className="text-[#d0011b]" size={18} />
+                      <div className="absolute top-0 right-0 p-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="w-8 h-8 rounded-full bg-[#D0011B]/10 flex items-center justify-center">
+                          <Plus size={14} className="text-[#D0011B]" />
+                        </div>
                       </div>
-                      <div className="space-y-0.5 pr-1">
-                        <h3 className="text-xs font-black text-neutral-900 dark:text-white group-hover:text-[#d0011b] uppercase tracking-wide flex items-center gap-1.5 transition-colors">
-                          Quero lucrar com a indicação
-                          <Zap size={11} className="text-[#d0011b]" />
-                        </h3>
-                        <p className="text-[10.5px] text-neutral-600 dark:text-gray-400 font-semibold leading-normal">
-                          Você recebe <b className="text-[#d0011b]">50% do valor</b> da compra e seu amigo ganha <b className="text-[#d0011b]">40% de desconto</b> na assinatura.
-                        </p>
+                      
+                      <div className="flex items-center gap-4 mb-3">
+                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#D0011B]/10 to-[#D0011B]/5 border border-[#D0011B]/20 flex items-center justify-center shrink-0 shadow-sm transition-transform group-hover:scale-110">
+                          <TrendingUp className="text-[#D0011B]" size={22} />
+                        </div>
+                        <div className="text-left">
+                          <h3 className="text-sm font-black text-neutral-900 dark:text-white uppercase tracking-tight group-hover:text-[#D0011B] transition-colors">
+                            Lucrar com Indicação
+                          </h3>
+                          <div className="flex items-center gap-1.5 mt-0.5">
+                            <span className="text-[10px] font-black text-emerald-500 uppercase">Ganhos de 50%</span>
+                            <div className="w-1 h-1 rounded-full bg-neutral-300" />
+                            <span className="text-[10px] font-bold text-neutral-400 uppercase">Recorrente</span>
+                          </div>
+                        </div>
                       </div>
+                      <p className="text-[11px] text-neutral-600 dark:text-gray-400 font-medium leading-relaxed text-left pl-1">
+                        Sua conexão assina com <span className="text-[#D0011B] font-bold">40% de desconto</span> e você recebe <span className="text-emerald-500 font-bold">50% de comissão</span> em todas as mensalidades.
+                      </p>
                     </button>
 
-                    {/* Button 2: QUERO PRESENTEAR MEU AMIGO */}
+                    {/* Option 2: Presentear */}
                     <button
                       onClick={() => setStep('presentear')}
-                      className="w-full text-left bg-neutral-50 hover:bg-neutral-100/70 dark:bg-[#15161b] dark:hover:bg-[#1e1f26] border border-neutral-200 dark:border-white/[0.05] hover:border-[#d0011b]/30 dark:hover:border-[#d0011b]/30 rounded-xl p-4 flex items-center gap-4 transition-all duration-300 hover:scale-[1.005] cursor-pointer group"
+                      className="group relative flex flex-col p-5 bg-neutral-50 dark:bg-white/[0.02] border border-neutral-200 dark:border-white/[0.05] hover:border-[#D0011B]/40 rounded-2xl transition-all duration-300 hover:shadow-[0_12px_32px_rgba(208,1,27,0.08)] cursor-pointer overflow-hidden"
                     >
-                      <div className="w-11 h-11 rounded-xl bg-[#d0011b]/10 border border-[#d0011b]/20 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                        <Heart className="text-[#d0011b] fill-[#d0011b]/15" size={18} />
+                      <div className="absolute top-0 right-0 p-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="w-8 h-8 rounded-full bg-[#D0011B]/10 flex items-center justify-center">
+                          <Gift size={14} className="text-[#D0011B]" />
+                        </div>
                       </div>
-                      <div className="space-y-0.5 pr-1">
-                        <h3 className="text-xs font-black text-neutral-900 dark:text-white group-hover:text-[#d0011b] uppercase tracking-wide flex items-center gap-1.5 transition-colors">
-                          Quero presentear meu amigo
-                          <Gift size={11} className="text-[#d0011b]" />
-                        </h3>
-                        <p className="text-[10.5px] text-neutral-600 dark:text-gray-400 font-semibold leading-normal">
-                          Seu amigo recebe <b className="text-[#d0011b]">créditos infinitos</b> dentro da ferramenta + <b className="text-[#d0011b]">40% de desconto</b> exclusivo na compra. Você abre mão da recompensa em favor dele.
-                        </p>
+
+                      <div className="flex items-center gap-4 mb-3">
+                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#D0011B]/10 to-[#D0011B]/5 border border-[#D0011B]/20 flex items-center justify-center shrink-0 shadow-sm transition-transform group-hover:scale-110">
+                          <Heart className="text-[#D0011B] fill-[#D0011B]/10" size={22} />
+                        </div>
+                        <div className="text-left">
+                          <h3 className="text-sm font-black text-neutral-900 dark:text-white uppercase tracking-tight group-hover:text-[#D0011B] transition-colors">
+                            Presentear Amigo
+                          </h3>
+                          <div className="flex items-center gap-1.5 mt-0.5">
+                            <span className="text-[10px] font-black text-[#D0011B] uppercase">Acesso Premium</span>
+                            <div className="w-1 h-1 rounded-full bg-neutral-300" />
+                            <span className="text-[10px] font-bold text-neutral-400 uppercase">Créditos Infinitos</span>
+                          </div>
+                        </div>
                       </div>
+                      <p className="text-[11px] text-neutral-600 dark:text-gray-400 font-medium leading-relaxed text-left pl-1">
+                        Seu amigo recebe <span className="text-[#D0011B] font-bold">créditos infinitos</span> + <span className="text-[#D0011B] font-bold">40% OFF</span>. Você doa sua comissão para potencializar o presente.
+                      </p>
                     </button>
                   </div>
                 </motion.div>
@@ -198,89 +225,34 @@ export default function ReferralPage({ isOpen, onClose, onNotification }: Referr
               {step === 'presentear' && (
                 <motion.div
                   key="presentear-screen"
-                  initial={{ opacity: 0, x: 10 }}
+                  initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -10 }}
-                  className="space-y-5 pt-1"
+                  exit={{ opacity: 0, x: -20 }}
+                  className="space-y-6"
                 >
-                  {/* Header */}
-                  <div className="text-center space-y-2">
-                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#d0011b]/10 border border-[#d0011b]/20 text-[#d0011b] text-[10px] font-black uppercase tracking-wider">
-                      <Gift size={11} className="text-[#d0011b]" />
-                      <span>Presenteie com créditos infinitos</span>
-                    </div>
+                  <button
+                    onClick={handleBackToSelect}
+                    className="group inline-flex items-center gap-2 text-[10px] font-black text-neutral-400 hover:text-[#D0011B] transition-colors uppercase tracking-widest pl-1"
+                  >
+                    <ArrowLeft size={14} className="transition-transform group-hover:-translate-x-1" />
+                    <span>Voltar para Modos</span>
+                  </button>
 
-                    <h2 className="text-2xl font-black tracking-tight text-neutral-900 dark:text-white leading-none">
-                      Indique amigos
-                    </h2>
-                    <p className="text-[11px] text-neutral-500 dark:text-gray-400 font-bold uppercase tracking-wide leading-none">
-                      e libere a ferramenta inteira para eles
-                    </p>
-
-                    {/* Trocar modo back link */}
-                    <div className="pt-2">
-                      <button
-                        onClick={handleBackToSelect}
-                        className="inline-flex items-center gap-1.5 text-[9px] font-black text-neutral-500 hover:text-neutral-900 dark:text-gray-400 dark:hover:text-white transition-colors cursor-pointer uppercase tracking-wider bg-neutral-100 dark:bg-white/5 py-1 px-2.5 rounded-lg border border-neutral-200 dark:border-white/5"
-                      >
-                        <ArrowLeft size={10} />
-                        <span>Trocar modo</span>
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* HOW IT WORKS CARD */}
-                  <div className="bg-neutral-50 dark:bg-[#121319] border border-neutral-200 dark:border-white/[0.04] rounded-xl p-4 space-y-3">
-                    <p className="text-[8.5px] font-black text-neutral-400 dark:text-gray-500 uppercase tracking-widest block text-left">
-                      Como funciona
-                    </p>
-
-                    <div className="space-y-2.5">
-                      <div className="flex items-start gap-2.5">
-                        <div className="w-5 h-5 rounded-md bg-[#d0011b]/10 border border-[#d0011b]/25 text-[#d0011b] flex items-center justify-center shrink-0 mt-0.5">
-                          <Zap size={11} />
-                        </div>
-                        <p className="text-xs font-bold text-neutral-700 dark:text-gray-300 text-left">
-                          Gere seu cupom de indicação personalizado
-                        </p>
+                  <div className="bg-neutral-50 dark:bg-white/[0.01] border border-neutral-200 dark:border-white/[0.05] rounded-2xl p-5 space-y-4">
+                    <div className="flex items-center gap-3 pb-3 border-b border-neutral-200/50 dark:border-white/5">
+                      <div className="w-8 h-8 rounded-lg bg-[#D0011B]/10 flex items-center justify-center text-[#D0011B]">
+                        <Users size={16} />
                       </div>
-
-                      <div className="flex items-start gap-2.5">
-                        <div className="w-5 h-5 rounded-md bg-[#d0011b]/10 border border-[#d0011b]/25 text-[#d0011b] flex items-center justify-center shrink-0 mt-0.5">
-                          <Crown size={11} />
-                        </div>
-                        <p className="text-xs font-bold text-neutral-700 dark:text-gray-300 text-left">
-                          Seu amigo desbloqueia <span className="text-[#d0011b] font-black">créditos infinitos</span> na ferramenta + <span className="text-[#d0011b] font-black">40% de desconto</span> na compra
-                        </p>
+                      <div className="flex-1">
+                        <h4 className="text-xs font-black text-neutral-900 dark:text-white uppercase tracking-tight">Configurar Vagas</h4>
+                        <p className="text-[9px] text-neutral-400 font-bold uppercase tracking-wider">Limite de 1 a 10 pessoas</p>
                       </div>
-
-                      <div className="flex items-start gap-2.5">
-                        <div className="w-5 h-5 rounded-md bg-[#d0011b]/10 border border-[#d0011b]/25 text-[#d0011b] flex items-center justify-center shrink-0 mt-0.5">
-                          <MessageSquare size={11} />
-                        </div>
-                        <p className="text-xs font-bold text-neutral-700 dark:text-gray-300 leading-normal text-left">
-                          Você abre mão da recompensa — todos os benefícios vão para o novo usuário
-                        </p>
+                      <div className="px-3 py-1 bg-white dark:bg-black/20 border border-neutral-200 dark:border-white/10 rounded-lg text-sm font-black text-[#D0011B]">
+                        {vagasPresente}
                       </div>
                     </div>
-                  </div>
 
-                  {/* RANGE AND ACTION CARD */}
-                  <div className="bg-neutral-50 dark:bg-[#121319] border border-neutral-200 dark:border-[#d0011b]/10 rounded-xl p-4.5 space-y-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-1.5">
-                        <Users size={13} className="text-[#d0011b]" />
-                        <span className="text-[9.5px] font-black uppercase text-neutral-400 dark:text-gray-400 tracking-wider">Vagas no cupom</span>
-                      </div>
-                      <span className="text-[9px] text-neutral-500 font-extrabold uppercase">Limite: 10</span>
-                    </div>
-
-                    <p className="text-[10px] font-bold text-neutral-500 dark:text-gray-400 leading-normal mt-1 text-left">
-                      Escolha quantas pessoas poderão usar este cupom (1 a 10).
-                    </p>
-
-                    {/* Range container matching requested aesthetic */}
-                    <div className="flex items-center gap-4 pt-1 pb-2">
+                    <div className="px-2 pt-2">
                       <input
                         type="range"
                         min="1"
@@ -290,66 +262,52 @@ export default function ReferralPage({ isOpen, onClose, onNotification }: Referr
                           setVagasPresente(Number(e.target.value));
                           if (presenteCoupon) setPresenteCoupon(null);
                         }}
-                        className="flex-grow h-1.5 rounded-lg appearance-auto bg-neutral-200 dark:bg-neutral-800 accent-[#d0011b] cursor-pointer outline-none"
+                        className="w-full h-1.5 rounded-lg appearance-auto bg-neutral-200 dark:bg-neutral-800 accent-[#D0011B] cursor-pointer outline-none"
                       />
-                      <div className="w-8 h-8 shrink-0 flex items-center justify-center bg-[#d0011b]/10 border border-[#d0011b]/20 text-[#d0011b] rounded-lg text-[13px] font-black">
-                        {vagasPresente}
-                      </div>
                     </div>
 
-                    {/* Master Action Trigger (Styled Crimson Red like Landing Button) */}
                     <button
                       type="button"
                       onClick={handleStartPresenteGeneration}
                       disabled={isGeneratingPresente}
-                      className="btn-custom w-full font-black text-sm tracking-wide relative overflow-hidden transition-all duration-200"
+                      className="btn-custom w-full font-black text-sm tracking-wide py-4 relative overflow-hidden transition-all duration-300 transform active:scale-95 shadow-[0_8px_20px_rgba(208,1,27,0.15)]"
                     >
                       {isGeneratingPresente ? (
                         <>
-                          <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin shrink-0" />
-                          <span>Gerando Cupom...</span>
+                          <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin shrink-0" />
+                          <span>Gerando Experiência...</span>
                         </>
                       ) : (
                         <>
-                          <Sparkles size={14} className="text-white shrink-0" />
-                          <span>Gerar cupom presente</span>
+                          <Sparkles size={16} className="text-white shrink-0" />
+                          <span>Gerar Cupom de Presente</span>
                         </>
                       )}
                     </button>
 
-                    {/* RESULT BLOCK IN REAL TIME */}
                     <AnimatePresence>
                       {presenteCoupon && (
                         <motion.div
-                          initial={{ opacity: 0, y: 10 }}
+                          initial={{ opacity: 0, y: 15 }}
                           animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0 }}
-                          className="pt-1.5"
+                          className="pt-2"
                         >
-                          <div className="bg-white dark:bg-black/35 rounded-xl border border-[#d0011b]/20 p-4 space-y-3 relative overflow-hidden shadow-sm dark:shadow-none">
-                            <div className="flex items-center gap-1.5 relative">
-                              <span className="text-[9px] font-black tracking-widest bg-[#d0011b] text-white px-2 py-0.5 rounded uppercase">
-                                SEU CUPOM
-                              </span>
-                              <span className="text-[9px] font-black tracking-widest bg-neutral-100 dark:bg-white/5 border border-neutral-200 dark:border-white/10 px-2 py-0.5 rounded uppercase text-neutral-700 dark:text-gray-300">
-                                {vagasPresente} {vagasPresente > 1 ? 'VAGAS' : 'VAGA'}
-                              </span>
-                              <span className="text-[9px] font-black tracking-widest text-[#EAB308] ml-auto uppercase flex items-center gap-0.5">
-                                👑 CRÉDITOS INFINITOS
-                              </span>
+                          <div className="bg-white dark:bg-black/40 rounded-2xl border-2 border-dashed border-[#D0011B]/30 p-5 space-y-4 shadow-inner">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[10px] font-black text-[#D0011B] uppercase tracking-widest bg-[#D0011B]/10 px-2 py-0.5 rounded">Código Gerado</span>
+                              <div className="flex items-center gap-1">
+                                <Crown size={12} className="text-amber-500" />
+                                <span className="text-[9px] font-black text-amber-500 uppercase">Créditos Infinitos</span>
+                              </div>
                             </div>
-
-                            <div className="flex items-center justify-between gap-3 pt-0.5">
-                              <p className="text-lg font-black tracking-wider text-neutral-900 dark:text-white select-all font-mono leading-none">
-                                {presenteCoupon}
-                              </p>
+                            
+                            <div className="flex items-center justify-between gap-4">
+                              <span className="text-2xl font-black tracking-[0.2em] text-neutral-900 dark:text-white font-mono">{presenteCoupon}</span>
                               <button
-                                type="button"
-                                onClick={() => handleCopyText(presenteCoupon, "Cupom copiado com sucesso! 📋")}
-                                className="inline-flex items-center gap-1.5 bg-[#d0011b]/10 hover:bg-[#d0011b]/20 border border-[#d0011b]/20 text-[#d0011b] dark:text-white font-bold text-[10px] py-1.5 px-3.5 rounded-lg cursor-pointer transition-all uppercase tracking-wider"
+                                onClick={() => handleCopyText(presenteCoupon, "Cupom presente copiado! 🎁")}
+                                className="p-2.5 rounded-xl bg-[#D0011B] text-white hover:bg-[#9B0014] transition-colors shadow-lg active:scale-90"
                               >
-                                <Copy size={11} />
-                                <span>Copiar</span>
+                                <Copy size={18} />
                               </button>
                             </div>
                           </div>
@@ -357,103 +315,41 @@ export default function ReferralPage({ isOpen, onClose, onNotification }: Referr
                       )}
                     </AnimatePresence>
                   </div>
-
-                  {/* Notice line */}
-                  <div className="text-center pt-1">
-                    <p className="text-[9.5px] text-gray-500 font-extrabold tracking-wide uppercase">
-                      Limite de 10 indicações por conta · sujeito aos termos
-                    </p>
-                  </div>
                 </motion.div>
               )}
 
-              {/* STEP 3: LUCRAR RECURRING REVENUE FLOW */}
+              {/* STEP 3: LUCRAR FLOW */}
               {step === 'lucrar' && (
                 <motion.div
                   key="lucrar-screen"
-                  initial={{ opacity: 0, x: 10 }}
+                  initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -10 }}
-                  className="space-y-5 pt-1"
+                  exit={{ opacity: 0, x: -20 }}
+                  className="space-y-6"
                 >
-                  {/* Header */}
-                  <div className="text-center space-y-2">
-                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#d0011b]/10 border border-[#d0011b]/20 text-[#d0011b] text-[10px] font-black uppercase tracking-wider">
-                      <Coins size={11} className="text-[#d0011b]" />
-                      <span>Lucrar com indicações</span>
-                    </div>
+                  <button
+                    onClick={handleBackToSelect}
+                    className="group inline-flex items-center gap-2 text-[10px] font-black text-neutral-400 hover:text-[#D0011B] transition-colors uppercase tracking-widest pl-1"
+                  >
+                    <ArrowLeft size={14} className="transition-transform group-hover:-translate-x-1" />
+                    <span>Voltar para Modos</span>
+                  </button>
 
-                    <h2 className="text-2xl font-black tracking-tight text-neutral-900 dark:text-white leading-none">
-                      Indique amigos
-                    </h2>
-                    <p className="text-[11px] text-neutral-500 dark:text-gray-400 font-bold uppercase tracking-wide leading-none">
-                      e ganhe comissão recorrente em dinheiro
-                    </p>
-
-                    {/* Trocar modo back link */}
-                    <div className="pt-2">
-                      <button
-                        onClick={handleBackToSelect}
-                        className="inline-flex items-center gap-1.5 text-[9px] font-black text-neutral-500 hover:text-neutral-900 dark:text-gray-400 dark:hover:text-white transition-colors cursor-pointer uppercase tracking-wider bg-neutral-100 dark:bg-white/5 py-1 px-2.5 rounded-lg border border-neutral-200 dark:border-white/5"
-                      >
-                        <ArrowLeft size={10} />
-                        <span>Trocar modo</span>
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* HOW IT WORKS CARD */}
-                  <div className="bg-neutral-50 dark:bg-[#121319] border border-neutral-200 dark:border-white/[0.04] rounded-xl p-4 space-y-3">
-                    <p className="text-[8.5px] font-black text-neutral-400 dark:text-gray-500 uppercase tracking-widest block text-left">
-                      Como funciona
-                    </p>
-
-                    <div className="space-y-2.5">
-                      <div className="flex items-start gap-2.5">
-                        <div className="w-5 h-5 rounded-md bg-[#d0011b]/10 border border-[#d0011b]/25 text-[#d0011b] flex items-center justify-center shrink-0 mt-0.5">
-                          <Zap size={11} />
-                        </div>
-                        <p className="text-xs font-bold text-neutral-700 dark:text-gray-300 text-left">
-                          Gere seu link ou cupom personalizado de afiliado
-                        </p>
+                  <div className="bg-neutral-50 dark:bg-white/[0.01] border border-neutral-200 dark:border-white/[0.05] rounded-2xl p-5 space-y-4">
+                    <div className="flex items-center gap-3 pb-3 border-b border-neutral-200/50 dark:border-white/5">
+                      <div className="w-8 h-8 rounded-lg bg-[#D0011B]/10 flex items-center justify-center text-[#D0011B]">
+                        <Zap size={16} />
                       </div>
-
-                      <div className="flex items-start gap-2.5">
-                        <div className="w-5 h-5 rounded-md bg-[#d0011b]/10 border border-[#d0011b]/25 text-[#d0011b] flex items-center justify-center shrink-0 mt-0.5">
-                          <Percent size={11} />
-                        </div>
-                        <p className="text-xs font-bold text-neutral-700 dark:text-gray-300 leading-normal text-left">
-                          Seu amigo ganha <span className="text-[#d0011b] font-black">40% de desconto</span> permanente na assinatura
-                        </p>
+                      <div className="flex-1">
+                        <h4 className="text-xs font-black text-neutral-900 dark:text-white uppercase tracking-tight">Ativar Canal</h4>
+                        <p className="text-[9px] text-neutral-400 font-bold uppercase tracking-wider">Configure até 10 slots</p>
                       </div>
-
-                      <div className="flex items-start gap-2.5">
-                        <div className="w-5 h-5 rounded-md bg-[#d0011b]/10 border border-[#d0011b]/25 text-[#d0011b] flex items-center justify-center shrink-0 mt-0.5">
-                          <TrendingUp size={11} />
-                        </div>
-                        <p className="text-xs font-bold text-neutral-700 dark:text-gray-300 leading-normal text-left">
-                          Você recebe <span className="text-emerald-500 font-extrabold">50% do valor</span> de todas as mensalidades dele diretamente no seu saldo
-                        </p>
+                      <div className="px-3 py-1 bg-white dark:bg-black/20 border border-neutral-200 dark:border-white/10 rounded-lg text-sm font-black text-[#D0011B]">
+                        {vagasLucro}
                       </div>
                     </div>
-                  </div>
 
-                  {/* RANGE AND ACTION CARD */}
-                  <div className="bg-neutral-50 dark:bg-[#121319] border border-neutral-200 dark:border-[#d0011b]/10 rounded-xl p-4.5 space-y-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-1.5">
-                        <Users size={13} className="text-[#d0011b]" />
-                        <span className="text-[9.5px] font-black uppercase text-neutral-400 dark:text-gray-400 tracking-wider">Vagas no cupom</span>
-                      </div>
-                      <span className="text-[9px] text-neutral-500 font-extrabold uppercase flex">Limite: 10</span>
-                    </div>
-
-                    <p className="text-[10px] font-bold text-neutral-500 dark:text-gray-400 leading-normal mt-1 text-left">
-                      Escolha quantas pessoas poderão usar este cupom (1 a 10).
-                    </p>
-
-                    {/* Range container with custom slider */}
-                    <div className="flex items-center gap-4 pt-1 pb-2">
+                    <div className="px-2 pt-2">
                       <input
                         type="range"
                         min="1"
@@ -463,63 +359,52 @@ export default function ReferralPage({ isOpen, onClose, onNotification }: Referr
                           setVagasLucro(Number(e.target.value));
                           if (lucroCoupon) setLucroCoupon(null);
                         }}
-                        className="flex-grow h-1.5 rounded-lg appearance-auto bg-neutral-200 dark:bg-neutral-800 accent-[#d0011b] cursor-pointer outline-none"
+                        className="w-full h-1.5 rounded-lg appearance-auto bg-neutral-200 dark:bg-neutral-800 accent-[#D0011B] cursor-pointer outline-none"
                       />
-                      <div className="w-8 h-8 shrink-0 flex items-center justify-center bg-[#d0011b]/10 border border-[#d0011b]/20 text-[#d0011b] rounded-lg text-[13px] font-black">
-                        {vagasLucro}
-                      </div>
                     </div>
 
-                    {/* Trigger button */}
                     <button
                       type="button"
                       onClick={handleStartLucroGeneration}
                       disabled={isGeneratingLucro}
-                      className="btn-custom w-full font-black text-sm tracking-wide relative overflow-hidden transition-all duration-200"
+                      className="btn-custom w-full font-black text-sm tracking-wide py-4 relative overflow-hidden transition-all duration-300 transform active:scale-95 shadow-[0_8px_20px_rgba(208,1,27,0.15)]"
                     >
                       {isGeneratingLucro ? (
                         <>
-                          <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin shrink-0" />
-                          <span>Configurando canal...</span>
+                          <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin shrink-0" />
+                          <span>Configurando Ganhos...</span>
                         </>
                       ) : (
                         <>
-                          <Sparkles size={14} className="text-white shrink-0" />
-                          <span>Gerar cupom de parceiro</span>
+                          <Coins size={16} className="text-white shrink-0" />
+                          <span>Ativar Cupom de Parceiro</span>
                         </>
                       )}
                     </button>
 
-                    {/* COUPON RESULT REVEALING UPON REQUEST */}
                     <AnimatePresence>
                       {lucroCoupon && (
                         <motion.div
-                          initial={{ opacity: 0, y: 10 }}
+                          initial={{ opacity: 0, y: 15 }}
                           animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0 }}
-                          className="pt-1.5"
+                          className="pt-2"
                         >
-                          <div className="bg-white dark:bg-black/35 rounded-xl border border-[#d0011b]/20 p-4 space-y-3 relative overflow-hidden shadow-sm dark:shadow-none">
-                            <div className="flex items-center gap-1.5 relative">
-                              <span className="text-[9px] font-black tracking-widest bg-[#d0011b] text-white px-2 py-0.5 rounded uppercase">
-                                SEU CUPOM DE PARCEIRO
-                              </span>
-                              <span className="text-[9px] font-black tracking-widest bg-[#10b981]/115 text-[#10b981] border border-[#10b981]/25 px-2 py-0.5 rounded uppercase ml-auto">
-                                🔥 50% RECORRENTE
-                              </span>
+                          <div className="bg-white dark:bg-black/40 rounded-2xl border-2 border-dashed border-emerald-500/30 p-5 space-y-4 shadow-inner">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest bg-emerald-500/10 px-2 py-0.5 rounded">Ativado com Sucesso</span>
+                              <div className="flex items-center gap-1">
+                                <TrendingUp size={12} className="text-emerald-500" />
+                                <span className="text-[9px] font-black text-emerald-500 uppercase">50% Recorrente</span>
+                              </div>
                             </div>
-
-                            <div className="flex items-center justify-between gap-3 pt-0.5">
-                              <p className="text-lg font-black tracking-wider text-neutral-900 dark:text-white select-all font-mono leading-none">
-                                {lucroCoupon}
-                              </p>
+                            
+                            <div className="flex items-center justify-between gap-4">
+                              <span className="text-2xl font-black tracking-[0.2em] text-neutral-900 dark:text-white font-mono">{lucroCoupon}</span>
                               <button
-                                type="button"
-                                onClick={() => handleCopyText(lucroCoupon, "Cupom de parceiro copiado! 📋")}
-                                className="inline-flex items-center gap-1.5 bg-[#d0011b]/10 hover:bg-[#d0011b]/20 border border-[#d0011b]/20 text-[#d0011b] dark:text-white font-bold text-[10px] py-1.5 px-3.5 rounded-lg cursor-pointer transition-all uppercase tracking-wider"
+                                onClick={() => handleCopyText(lucroCoupon, "Cupom de parceiro copiado! 💰")}
+                                className="p-2.5 rounded-xl bg-emerald-500 text-white hover:bg-emerald-600 transition-colors shadow-lg active:scale-90"
                               >
-                                <Copy size={11} />
-                                <span>Copiar</span>
+                                <Copy size={18} />
                               </button>
                             </div>
                           </div>
@@ -527,17 +412,14 @@ export default function ReferralPage({ isOpen, onClose, onNotification }: Referr
                       )}
                     </AnimatePresence>
                   </div>
-
-                  {/* Notice tag */}
-                  <div className="text-center pt-1">
-                    <p className="text-[9.5px] text-gray-500 font-extrabold tracking-wide uppercase">
-                      Limite de 10 indicações por conta · sujeito aos termos
-                    </p>
-                  </div>
                 </motion.div>
               )}
 
             </AnimatePresence>
+            
+            <p className="text-[9px] text-neutral-400 font-extrabold uppercase tracking-widest text-center pt-4">
+              Cada indicação fortalece a comunidade ShopSpy
+            </p>
           </div>
         </motion.div>
       </div>
