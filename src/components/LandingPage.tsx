@@ -697,7 +697,7 @@ export default function LandingPage({ onEnterLogin }: LandingPageProps) {
       </AnimatePresence>
 
       {/* SEÇÃO HERO */}
-      <header id="inicio" className="relative pt-[160px] pb-20 px-6 max-w-[1000px] mx-auto text-center bg-white overflow-hidden">
+      <header id="inicio" className="relative pt-[160px] pb-20 w-full text-center bg-white overflow-hidden">
         {/* Soft background ambient radial gradient color */}
         <div 
           className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px] -z-10 rounded-full select-none pointer-events-none" 
@@ -720,7 +720,7 @@ export default function LandingPage({ onEnterLogin }: LandingPageProps) {
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          className="relative w-full max-w-[900px] mx-auto rounded-[32px] overflow-hidden shadow-[0_24px_80px_rgba(208,1,27,0.12)] border border-[#D0011B]/10"
+          className="relative w-full overflow-hidden shadow-[0_24px_80px_rgba(208,1,27,0.12)] border-y border-[#D0011B]/10"
         >
           <img 
             src="https://i.postimg.cc/B6NJvG7r/Cinematic-ultra-wide-hero-banner-image-202606262228.jpg" 
@@ -731,62 +731,6 @@ export default function LandingPage({ onEnterLogin }: LandingPageProps) {
         </motion.div>
 
 
-          {/* Operational Flow representation for Brands (Google, Shopee, Facebook) */}
-          <motion.div
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.45 }}
-            className="w-full max-w-[720px] bg-neutral-50/55 rounded-2xl border border-neutral-100/70 p-5 mt-4 text-center select-none backdrop-blur-sm self-center"
-          >
-            <p className="text-[10px] font-black uppercase tracking-wider text-[#A00014] mb-3.5">
-              🚀 CONEXÃO COMPLETA E FLUXO OPERACIONAL EM 3 PASSOS
-            </p>
-            <div className="flex flex-col md:flex-row items-center justify-center gap-3 md:gap-5">
-              {/* Google Brand Card */}
-              <div className="flex items-center gap-2.5 bg-white px-4 py-2.5 rounded-xl border border-neutral-150 shadow-sm w-full md:w-auto hover:border-blue-300 transition-colors duration-200">
-                <svg className="w-4.5 h-4.5 shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-                  <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-                  <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22c-.22-.66-.35-1.36-.35-2.09z" fill="#FBBC05"/>
-                  <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"/>
-                </svg>
-                <div className="text-left">
-                  <p className="text-[8.5px] text-gray-500 uppercase tracking-wide font-bold">Início com IA</p>
-                  <p className="text-[12px] font-black text-gray-800 -mt-0.5">Google Web & IA</p>
-                </div>
-              </div>
-
-              {/* Connected Arrow badge */}
-              <div className="text-neutral-400 font-extrabold text-sm rotate-90 md:rotate-0 tracking-widest my-1 md:my-0">
-                ➔
-              </div>
-
-              {/* Shopee Brand Card */}
-              <div className="flex items-center gap-2.5 bg-[#FFDFE7]/25 px-4 py-2.5 rounded-xl border border-[#D0011B]/15 shadow-sm w-full md:w-auto hover:border-[#D0011B]/40 transition-colors duration-200">
-                <span className="w-5.5 h-5.5 flex items-center justify-center bg-[#D0011B] text-white font-serif rounded-lg font-extrabold text-[12px] select-none shadow-[0_2px_8px_rgba(208,1,27,0.25)] shrink-0">S</span>
-                <div className="text-left">
-                  <p className="text-[8.5px] text-[#A00014] uppercase tracking-wide font-bold">Importação</p>
-                  <p className="text-[12px] font-black text-[#D0011B] -mt-0.5">Shopee Oficial</p>
-                </div>
-              </div>
-
-              {/* Connected Arrow badge */}
-              <div className="text-neutral-400 font-extrabold text-sm rotate-90 md:rotate-0 tracking-widest my-1 md:my-0">
-                ➔
-              </div>
-
-              {/* Facebook Brand Card */}
-              <div className="flex items-center gap-2.5 bg-white px-4 py-2.5 rounded-xl border border-neutral-150 shadow-sm w-full md:w-auto hover:border-blue-400 transition-colors duration-200">
-                <svg className="w-5 h-5 text-[#1877F2] fill-current shrink-0" viewBox="0 0 24 24">
-                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-                </svg>
-                <div className="text-left">
-                  <p className="text-[8.5px] text-gray-500 uppercase tracking-wide font-bold">Divulgação Ativa</p>
-                  <p className="text-[12px] font-black text-gray-800 -mt-0.5">Facebook Grupos</p>
-                </div>
-              </div>
-            </div>
-        </motion.div>
       </header>
 
       {/* SAAS EXPERIENCE DEMONSTRATIVE PREVIEW */}
@@ -1007,13 +951,40 @@ export default function LandingPage({ onEnterLogin }: LandingPageProps) {
             </div>
             <AnimatePresence>
               {couponApplied && (
-                <motion.p
-                  initial={{ opacity: 0, y: -5 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="text-emerald-650 text-xs font-bold mt-3.5 flex items-center justify-center gap-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-xl py-2 px-4.5 inline-block"
-                >
-                  <span className="text-emerald-500 font-extrabold text-sm">✓</span> Cupom ativo! Benefício da indicação aplicado com sucesso abaixo.
-                </motion.p>
+                <div className="flex flex-col gap-3 mt-6 items-center">
+                  <motion.div
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    id="coupon-toast-success"
+                    className="flex items-center gap-3 bg-[#1e293b] border border-blue-500/20 rounded-full py-2.5 px-5 shadow-lg w-full max-w-sm justify-between"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-400">
+                        <Gift size={18} />
+                      </div>
+                      <div className="text-left font-sans">
+                        <p className="text-[10px] font-bold text-gray-400 uppercase leading-none">Cupom Aplicado</p>
+                        <p className="text-sm font-black text-white">{coupon || 'SHOPSPY2026'}</p>
+                      </div>
+                    </div>
+                    <button onClick={() => setCouponApplied(false)} className="text-gray-400 hover:text-white transition-colors bg-transparent border-none cursor-pointer">
+                      <X size={14} />
+                    </button>
+                  </motion.div>
+
+                  <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    className="flex items-center gap-3 bg-[#1e293b] border border-blue-500/20 rounded-full py-2.5 px-5 shadow-lg w-full max-w-sm"
+                  >
+                    <div className="w-8 h-8 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-400 shrink-0">
+                      <Heart size={18} />
+                    </div>
+                    <p className="text-[11px] sm:text-[12px] font-semibold text-gray-200 text-left leading-tight">
+                      O usuário que indicou <span className="font-black text-white">abriu mão de qualquer recompensa</span> para destinar créditos infinitos à sua conta.
+                    </p>
+                  </motion.div>
+                </div>
               )}
             </AnimatePresence>
             {couponError && (

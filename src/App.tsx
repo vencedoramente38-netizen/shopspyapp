@@ -265,7 +265,7 @@ export default function App() {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[#f9f9f9] dark:bg-[#0A0A0A] transition-colors duration-300 font-sans">
+    <div className="flex h-screen overflow-hidden bg-[#f9f9f9] dark:bg-[#09090B] transition-colors duration-300 font-sans">
       {/* Mobile Overlay */}
       <AnimatePresence>
         {isMobile && isSidebarExpanded && (
@@ -305,7 +305,7 @@ export default function App() {
       >
         {/* Header/Navbar removed from inside the tool to maximize working screen real estate */}
 
-        <div className="flex-1 overflow-y-auto bg-white dark:bg-[#0A0A0A] flex flex-col transition-colors duration-300 relative">
+        <div className="flex-1 overflow-y-auto bg-white dark:bg-[#09090B] flex flex-col transition-colors duration-300 relative">
           {/* Ambient Corner Red Glowing Shadows & Dot/Line Grid Overlay (Dark Mode Only) */}
           <div className="hidden dark:block pointer-events-none absolute inset-0 z-0 overflow-hidden select-none">
             {/* Soft Ambient Crimson Glowing Lights in corners */}

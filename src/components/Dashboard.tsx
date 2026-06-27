@@ -449,10 +449,10 @@ export default function Dashboard({ products: productsProp, isDarkMode = true }:
   };
 
   // Theme support helpers
-  const bgClass = isDarkMode ? 'bg-[#0a0a0a]' : 'bg-[#f8f9fa]';
-  const cardBgClass = isDarkMode ? 'bg-[#111111] border-white/5' : 'bg-white border-gray-200/60 shadow-sm';
-  const headerIconBg = isDarkMode ? 'bg-[#1a1a1a]' : 'bg-gray-200/70 hover:bg-gray-300/80';
-  const headerIconBorder = isDarkMode ? 'border-white/5' : 'border-gray-200/40';
+  const bgClass = isDarkMode ? 'bg-[#09090B]' : 'bg-[#f8f9fa]';
+  const cardBgClass = isDarkMode ? 'glass-obsidian-card border-white/5' : 'bg-white border-gray-200/60 shadow-sm';
+  const headerIconBg = isDarkMode ? 'bg-white/5' : 'bg-gray-200/70 hover:bg-gray-300/80';
+  const headerIconBorder = isDarkMode ? 'border-white/10' : 'border-gray-200/40';
   const headerIconColor = isDarkMode ? 'text-white' : 'text-gray-800';
   const textPrimary = isDarkMode ? 'text-white' : 'text-gray-900';
   const textMuted = isDarkMode ? 'text-gray-400' : 'text-gray-500';
@@ -469,7 +469,7 @@ export default function Dashboard({ products: productsProp, isDarkMode = true }:
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-black/60 dark:bg-[#0A0A0A]/85 backdrop-blur-md rounded-2xl"
+            className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-black/60 dark:bg-[#09090B]/85 backdrop-blur-md rounded-2xl"
           >
             <motion.div
               initial={{ scale: 0.9, y: 10 }}
@@ -555,7 +555,7 @@ export default function Dashboard({ products: productsProp, isDarkMode = true }:
       </div>
 
       {/* FILTRO DE PERÍODO */}
-      <div className={`mt-6 flex flex-wrap items-center gap-2 ${isDarkMode ? 'bg-[#111111]/80 border-white/5' : 'bg-white border-gray-200 shadow-sm'} p-1.5 rounded-full border max-w-fit transition-colors duration-300`}>
+      <div className={`mt-6 flex flex-wrap items-center gap-2 ${isDarkMode ? 'bg-white/5 border-white/10 backdrop-blur-md shadow-inner' : 'bg-white border-gray-200 shadow-sm'} p-1.5 rounded-full border max-w-fit transition-colors duration-300`}>
         {periods.map(period => (
           <button
             key={period}
@@ -564,12 +564,12 @@ export default function Dashboard({ products: productsProp, isDarkMode = true }:
               background: 'linear-gradient(180deg, #E21B33 0%, #D0011B 50%, #B00014 100%)',
               color: '#ffffff',
               border: '1px solid rgba(255, 255, 255, 0.15)',
-              boxShadow: '0 4px 12px rgba(208, 1, 27, 0.3), inset 0 1.5px 3px rgba(255, 255, 255, 0.2), inset 0 -1.5px 3px rgba(0, 0, 0, 0.2)',
+              boxShadow: '0 4px 15px rgba(208, 1, 27, 0.4), inset 0 1.5px 3px rgba(255, 255, 255, 0.2)',
             } : {}}
-            className={`px-4 py-1.5 text-xs transition-all duration-200 border-none cursor-pointer ${
+            className={`px-4 py-1.5 text-xs transition-all duration-300 border-none cursor-pointer rounded-full ${
               activePeriod === period 
-                ? 'font-bold rounded-full text-white' 
-                : `bg-transparent ${textMuted} hover:${textPrimary}`
+                ? 'font-black text-white shadow-lg scale-105' 
+                : `bg-transparent ${textMuted} hover:text-white hover:bg-white/5`
             }`}
           >
             {period}
