@@ -64,17 +64,17 @@ export default function AdminPanel({ isOpen, onClose }: AdminPanelProps) {
   }, [isOpen]);
 
   const colors = {
-    panel: theme === 'dark' ? 'bg-[#0f0f0f]' : 'bg-[#f9f9f9]',
-    card: theme === 'dark' ? 'bg-[#111111]' : 'bg-white',
-    input: theme === 'dark' ? 'bg-[#1a1a1a]' : 'bg-[#f0f0f0]',
-    text: theme === 'dark' ? 'text-white' : 'text-[#111111]',
-    textFull: theme === 'dark' ? 'rgba(255,255,255,1)' : '#111111',
-    muted: theme === 'dark' ? 'text-white/40' : 'text-[#666666]',
-    border: theme === 'dark' ? 'border-white/[0.08]' : 'border-[#e5e5e5]',
-    borderSubtle: theme === 'dark' ? 'border-white/[0.06]' : 'border-[#e5e5e5]',
-    shadow: theme === 'dark' ? 'shadow-[-8px_0_32px_rgba(0,0,0,0.6)]' : 'shadow-[0_2px_12px_rgba(0,0,0,1)]',
-    toggleTrack: theme === 'dark' ? 'bg-[#333]' : 'bg-[#eeeeee]',
-    closeBtn: theme === 'dark' ? 'bg-white/[0.06]' : 'bg-black/[0.06]',
+    panel: 'bg-[#09090B]',
+    card: 'glass-obsidian',
+    input: 'bg-white/5',
+    text: 'text-white',
+    textFull: 'rgba(255,255,255,1)',
+    muted: 'text-white/40',
+    border: 'border-white/[0.08]',
+    borderSubtle: 'border-white/[0.06]',
+    shadow: 'shadow-[-8px_0_32px_rgba(0,0,0,0.6)]',
+    toggleTrack: 'bg-white/10',
+    closeBtn: 'bg-white/[0.06]',
   };
 
   // Config states

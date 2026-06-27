@@ -47,116 +47,116 @@ export default function ProductCard({
   return (
     <div 
       onClick={() => onAnalyze(product)}
-      className="group relative w-full bg-white dark:bg-[#111111] border border-black/5 dark:border-white/5 shadow-[0_4px_20px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_25px_rgba(0,0,0,0.5)] rounded-[12px] overflow-hidden cursor-pointer transition-all duration-200 hover:scale-[1.02] hover:border-black/10 dark:hover:border-white/10"
+      className="group relative w-full glass-obs-product rounded-[20px] overflow-hidden cursor-pointer transition-all duration-400 hover:scale-[1.03] hover:border-[#D0011B]/30 glass-obsidian-product"
     >
       {/* Image Section - aspect-[3/4] */}
-      <div className="relative aspect-[3/4] overflow-hidden bg-black">
+      <div className="relative aspect-[3/4] overflow-hidden bg-black/40">
         <img
           src={product.imagem}
           alt={product.nome}
           referrerPolicy="no-referrer"
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
         />
         
         {/* Badge TOP #N */}
-        <div className="absolute top-2 left-2 px-2.5 py-1 bg-black/80 text-white text-[11px] font-bold rounded-[6px] z-10 shadow-sm font-['Space_Grotesk'] border border-white/5">
+        <div className="absolute top-3 left-3 px-3 py-1 bg-black/60 backdrop-blur-md text-white text-[11px] font-black rounded-lg z-10 shadow-lg border border-white/10 uppercase tracking-wider">
           TOP #{product.ranking}
         </div>
 
         {/* Badge CATEGORIA */}
-        <div className="absolute top-2 right-2 px-2.5 py-1 bg-black/80 text-white text-[10px] font-semibold rounded-[6px] z-10 shadow-sm font-['Space_Grotesk'] border border-white/5">
+        <div className="absolute top-3 right-3 px-3 py-1 bg-black/60 backdrop-blur-md text-white text-[10px] font-black rounded-lg z-10 shadow-lg border border-white/10 uppercase tracking-widest">
           {product.categoria}
         </div>
 
         {/* Favorite Button */}
         <button 
           onClick={toggleFavorite}
-          className="absolute top-9 right-2 w-[32px] h-[32px] rounded-full flex items-center justify-center cursor-pointer transition-all duration-200 z-[2] bg-black/40 backdrop-blur-sm border border-white/10 hover:bg-black/60 shadow-sm text-white"
+          className="absolute top-11 right-3 w-[36px] h-[36px] rounded-full flex items-center justify-center cursor-pointer transition-all duration-300 z-[2] bg-black/40 backdrop-blur-md border border-white/10 hover:bg-[#D0011B]/20 shadow-lg text-white group/fav"
         >
           <Heart 
-            size={16} 
-            className={`transition-colors duration-200 ${isFavorite ? 'text-[#D0011B] fill-[#D0011B]' : 'text-white'}`} 
+            size={18} 
+            className={`transition-all duration-300 ${isFavorite ? 'text-[#D0011B] fill-[#D0011B] scale-110' : 'text-white'}`} 
           />
         </button>
         
         {/* Badge Alta Demanda ou HOT */}
         {product.desconto ? (
-          <div className="absolute bottom-2 left-2 px-2.5 py-1 bg-[#D0011B] text-white text-[10px] font-bold rounded-[20px] flex items-center gap-1 shadow-[0_4px_12px_rgba(208,1,27,0.5)] font-['Space_Grotesk'] border border-white/10">
+          <div className="absolute bottom-3 left-3 px-3 py-1.5 bg-[#D0011B] text-white text-[10px] font-black rounded-full flex items-center gap-1.5 shadow-[0_12px_24px_rgba(208,1,27,0.4)] border border-white/20 uppercase tracking-widest">
             <span>🔥</span>
             HOT {product.desconto} OFF
           </div>
         ) : (
-          <div className="absolute bottom-2 left-2 px-2.5 py-1 bg-[#D0011B] text-white text-[10px] font-bold rounded-[20px] flex items-center gap-1 shadow-md font-['Space_Grotesk']">
-            <TrendingUp size={10} />
-            Alta Demanda
+          <div className="absolute bottom-3 left-3 px-3 py-1.5 bg-[#D0011B] text-white text-[10px] font-black rounded-full flex items-center gap-1.5 shadow-[0_12px_24px_rgba(208,1,27,0.4)] border border-white/20 uppercase tracking-widest">
+            <TrendingUp size={12} />
+            ALTÍSSIMA DEMANDA
           </div>
         )}
 
         {/* Overlay ao Hover */}
-        <div className="absolute inset-0 bg-black/25 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-          <div className="px-6 py-2.5 bg-[#D0011B] text-white rounded-full text-[13px] font-bold transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 shadow-lg font-['Space_Grotesk']">
+        <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-400 flex items-center justify-center">
+          <div className="px-6 py-3 bg-[#D0011B] text-white rounded-full text-[13px] font-black uppercase tracking-widest transform translate-y-4 group-hover:translate-y-0 transition-transform duration-400 shadow-[0_12px_32px_rgba(208,1,27,0.4)]">
             Analisar Produto
           </div>
         </div>
       </div>
 
       {/* Corpo do Card */}
-      <div className="p-3 bg-white dark:bg-[#111111] text-gray-900 dark:text-white transition-colors duration-300">
+      <div className="p-4 flex flex-col gap-2">
         
         {/* Nome produto */}
-        <h3 className="text-[13px] font-semibold text-gray-950 dark:text-white line-clamp-2 leading-[1.4] mb-1.5 h-[36px] font-['Space_Grotesk']">
+        <h3 className="text-[13px] font-bold text-white/90 line-clamp-2 leading-[1.4] mb-1 min-h-[36px] tracking-tight group-hover:text-white transition-colors">
           {product.nome}
         </h3>
 
         {/* Preço */}
-        <div className="mb-1 flex items-baseline gap-2 font-['Space_Grotesk']">
-          <span className="text-[18px] font-extrabold text-[#D0011B] dark:text-white">
+        <div className="flex items-baseline gap-2 mb-1">
+          <span className="text-xl font-black text-[#D0011B]">
             {product.preco}
           </span>
           {product.precoOriginal && (
-            <span className="text-[11px] text-gray-400 dark:text-white/40 line-through">
+            <span className="text-[11px] text-white/30 line-through font-medium">
               {product.precoOriginal}
             </span>
           )}
         </div>
 
-        {/* Linha de stats: ★ ${avaliacao} amarelo + | ${vendas} vendidos */}
-        <div className="flex items-center gap-1.5 text-[11px] text-gray-500 dark:text-white/50 mb-2 font-['Space_Grotesk']">
-          <div className="flex items-center gap-0.5 text-yellow-500 dark:text-yellow-400">
-            <Star size={11} fill="currentColor" />
-            <span className="font-bold">{product.avaliacao}</span>
+        {/* Linha de stats */}
+        <div className="flex items-center gap-4 text-[11px] text-white/40 mb-1 font-bold uppercase tracking-wider">
+          <div className="flex items-center gap-1 text-yellow-400">
+            <Star size={12} fill="currentColor" />
+            <span>{product.avaliacao}</span>
           </div>
-          <span className="text-gray-300 dark:text-white/20">|</span>
+          <div className="w-1 h-1 rounded-full bg-white/10" />
           <span>{product.vendas} vendidos</span>
         </div>
 
-        {/* Barra Score Viral */}
-        <div className="mb-3">
-          <div className="text-[10px] text-gray-400 dark:text-white/40 uppercase font-bold mb-1 font-['Space_Grotesk']">Score Viral</div>
-          <div className="w-full h-1.5 bg-gray-100 dark:bg-white/10 rounded-full overflow-hidden">
+        {/* Score Viral */}
+        <div className="mt-1 space-y-1.5">
+          <div className="flex justify-between items-center text-[9px] font-black text-white/30 uppercase tracking-[0.2em]">
+            <span>Score Viral</span>
+            <span className="text-[#D0011B]">{product.scoreViral}%</span>
+          </div>
+          <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden border border-white/5">
             <div 
-              className="h-full bg-[#D0011B] rounded-full" 
+              className="h-full bg-gradient-to-r from-[#D0011B] to-[#ff4444] rounded-full shadow-[0_0_8px_rgba(208,1,27,0.4)]" 
               style={{ width: `${product.scoreViral}%` }}
-            ></div>
+            />
           </div>
         </div>
 
-        {/* Botões Analisar & Afiliar-se */}
-        <div className="grid grid-cols-1 gap-2 mt-auto">
-          
-          <button 
-            onClick={(e) => {
-              e.stopPropagation();
-              onAffiliate();
-              const affiliateLink = product.link || `https://shopee.com.br/search?keyword=${encodeURIComponent(product.nome)}`;
-              window.open(affiliateLink, '_blank');
-            }}
-            className="btn-custom w-full !py-2 !px-2.5 !text-[11px] font-bold tracking-wide !rounded-lg flex items-center justify-center gap-1.5 select-none"
-          >
-            <ExternalLink size={12} />
-            <span>Afiliar-se</span>
-          </button>
-        </div>
+        {/* Botão Afiliar-se */}
+        <button 
+          onClick={(e) => {
+            e.stopPropagation();
+            onAffiliate();
+            const affiliateLink = product.link || `https://shopee.com.br/search?keyword=${encodeURIComponent(product.nome)}`;
+            window.open(affiliateLink, '_blank');
+          }}
+          className="btn-custom w-full !py-2.5 !px-3 !text-[11px] !rounded-xl flex items-center justify-center gap-2 mt-2 opacity-95 hover:opacity-100"
+        >
+          <ExternalLink size={14} />
+          <span className="font-black uppercase tracking-widest">Link de Afiliado</span>
+        </button>
       </div>
     </div>
   );

@@ -520,7 +520,7 @@ OUTPUT FORMAT: Single JPG image, 9:16 aspect ratio.`;
             {templates.map((tpl) => (
               <div 
                 key={tpl.id}
-                className="flex flex-col bg-white dark:bg-[#111111] rounded-2xl border border-black/5 dark:border-white/[0.08] overflow-hidden shadow-xs dark:shadow-none hover:border-[#D0011B]/40 dark:hover:border-white/20 transition-all duration-300 group"
+                className="flex flex-col glass-obsidian rounded-2xl overflow-hidden shadow-xs hover:border-[#D0011B]/40 transition-all duration-300 group"
               >
                 {/* 9:16 Video Player Container */}
                 <div className="relative aspect-[9/16] w-full bg-black/95 flex flex-col justify-between overflow-hidden cursor-pointer">
@@ -622,7 +622,7 @@ OUTPUT FORMAT: Single JPG image, 9:16 aspect ratio.`;
 
             {/* LOADING SCREEN */}
             {isLoading && (
-              <div className="flex flex-col items-center justify-center p-12 px-6 bg-white dark:bg-[#111111] border border-black/5 dark:border-white/[0.08] rounded-2xl shadow-xl">
+              <div className="flex flex-col items-center justify-center p-12 px-6 glass-obsidian rounded-3xl shadow-2xl">
                 <style>{`
                   @keyframes rotate-loader {
                     from { transform: rotate(0deg); }
@@ -666,7 +666,7 @@ OUTPUT FORMAT: Single JPG image, 9:16 aspect ratio.`;
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -20 }}
                     transition={{ duration: 0.2 }}
-                    className="bg-white dark:bg-[#111111] border border-black/5 dark:border-white/[0.08] rounded-[14px] p-5 sm:p-6 space-y-5 shadow-lg"
+                    className="glass-obsidian rounded-2xl p-6 sm:p-8 space-y-6 shadow-xl"
                   >
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-1 border-b border-black/[0.04] dark:border-white/[0.04]">
                       <div className="space-y-1">

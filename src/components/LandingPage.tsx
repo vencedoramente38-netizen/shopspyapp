@@ -430,8 +430,8 @@ function LegacyDeactivatedMockCode() {
                     </div>
                     
                     <div className="space-y-2 overflow-y-auto custom-scrollbar my-1 text-[7.5px] tracking-tight leading-relaxed">
-                      <p className="text-gray-600"><strong className="text-gray-900">🚀 Gancho Shopee:</strong> "Eu não acreditava nesse produto da Shopee até testar em casa..."</p>
-                      <p className="text-gray-600"><strong className="text-gray-900">📝 Roteiro Viral:</strong> "🚨 Alerta de achado útil da Shopee! Esse organizador salva vidas..."</p>
+                      <p className="text-gray-400"><strong className="text-gray-900">🚀 Gancho Shopee:</strong> "Eu não acreditava nesse produto da Shopee até testar em casa..."</p>
+                      <p className="text-gray-400"><strong className="text-gray-900">📝 Roteiro Viral:</strong> "🚨 Alerta de achado útil da Shopee! Esse organizador salva vidas..."</p>
                       <p className="text-gray-500"><strong className="text-gray-800">🎯 Tags Shopee:</strong> #achadinhos #shopee #comprinhas #viral #ofertas</p>
                     </div>
 
@@ -697,11 +697,11 @@ export default function LandingPage({ onEnterLogin }: LandingPageProps) {
       </AnimatePresence>
 
       {/* SEÇÃO HERO */}
-      <header id="inicio" className="relative pt-[160px] pb-20 w-full text-center bg-white overflow-hidden">
+      <header id="inicio" className="relative pt-[160px] pb-20 w-full text-center bg-transparent overflow-hidden">
         {/* Soft background ambient radial gradient color */}
         <div 
-          className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px] -z-10 rounded-full select-none pointer-events-none" 
-          style={{ background: 'radial-gradient(ellipse 80% 60% at 50% -10%, rgba(208,1,27,0.08) 0%, transparent 70%)' }}
+          className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[600px] -z-10 rounded-full select-none pointer-events-none" 
+          style={{ background: 'radial-gradient(ellipse 80% 60% at 50% -10%, rgba(208,1,27,0.15) 0%, transparent 70%)' }}
         />
 
         {/* Particles overlay inside the hero section */}
@@ -734,7 +734,10 @@ export default function LandingPage({ onEnterLogin }: LandingPageProps) {
       </header>
 
       {/* SAAS EXPERIENCE DEMONSTRATIVE PREVIEW */}
-      <section className="bg-neutral-50 py-16">
+      <section className="bg-transparent py-24 relative overflow-hidden">
+        {/* Background glow for this section */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] bg-red-900/10 blur-[120px] rounded-full pointer-events-none -z-10" />
+        
         <motion.div 
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -742,21 +745,24 @@ export default function LandingPage({ onEnterLogin }: LandingPageProps) {
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
           className="max-w-5xl mx-auto px-4 text-center"
         >
-          <div className="max-w-2xl mx-auto mb-8">
-            <span className="text-[10px] font-black uppercase text-[#D0011B] tracking-widest bg-[#D0011B]/8 px-2.5 py-1 rounded">
+          <div className="max-w-2xl mx-auto mb-12">
+            <span className="text-[10px] font-black uppercase text-[#D0011B] tracking-widest glass-obsidian px-3 py-1 rounded-full border-white/5">
               💻 Painel Demonstrativo
             </span>
-            <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mt-2 font-['Space_Grotesk']">
+            <h3 className="text-3xl sm:text-4xl font-black text-white mt-4 font-['Space_Grotesk'] tracking-tighter leading-tight uppercase">
               Simule a Experiência Real do ShopSpy
             </h3>
-            <p className="text-xs text-gray-500 mt-1">Interaja com o aplicativo abaixo em tempo real e descubra novas oportunidades.</p>
+            <p className="text-gray-400 font-medium text-sm sm:text-base mt-2">
+              Interaja com o aplicativo abaixo em tempo real e descubra novas oportunidades.
+            </p>
           </div>
           <InteractiveMacbookMockup />
         </motion.div>
       </section>
 
       {/* SEÇÃO BENEFÍCIOS */}
-      <section id="beneficios" className="px-6 py-20 bg-[#f9f9f9]">
+      <section id="beneficios" className="px-6 py-20 bg-transparent relative overflow-hidden border-t border-white/5">
+        <div className="absolute top-0 left-0 w-full h-[300px] bg-gradient-to-b from-[#05060f] to-transparent pointer-events-none -z-10" />
         <div className="max-w-[1200px] mx-auto text-center">
           <motion.h2 
             initial={{ opacity: 0, y: 20 }}
@@ -1105,8 +1111,8 @@ export default function LandingPage({ onEnterLogin }: LandingPageProps) {
             {/* VITALÍCIO CARD DESTAQUE */}
             <div className={`rounded-[40px] px-8 py-12 flex flex-col justify-between h-full relative overflow-hidden transition-all duration-500 border ${
               couponApplied 
-                ? 'border-[#D0011B] bg-neutral-950/[0.01]/5 shadow-[0_25px_60px_rgba(208,1,27,0.16)] scale-[1.01]' 
-                : 'border-[#D0011B]/20 bg-white shadow-[0_25px_50px_-12px_rgba(208,1,27,0.06)] hover:border-[#D0011B]/40'
+                ? 'border-[#D0011B] glass-obsidian !bg-[#D0011B]/5 shadow-[0_25px_60px_rgba(208,1,27,0.16)] scale-[1.01]' 
+                : 'border-white/10 glass-obsidian shadow-[0_25px_50px_-12px_rgba(0,0,0,0.3)] hover:border-[#D0011B]/40'
             }`}>
               {/* Shine effect animation div */}
               <div className="absolute inset-0 pointer-events-none opacity-25 bg-[linear-gradient(120deg,rgba(255,255,255,0)30%,rgba(208,1,27,0.06)50%,rgba(255,255,255,0)70%)] animate-shine-effect z-[1]" />
@@ -1231,7 +1237,7 @@ export default function LandingPage({ onEnterLogin }: LandingPageProps) {
           </div>
 
           {/* URGENCY REGISTRATION BAR */}
-          <div className="max-w-[700px] mx-auto bg-[#f9f9f9] border border-neutral-200/60 rounded-[18px] p-6 flex flex-col sm:flex-row items-center gap-6 shadow-xs mt-10">
+          <div className="max-w-[700px] mx-auto bg-transparent border border-neutral-200/60 rounded-[18px] p-6 flex flex-col sm:flex-row items-center gap-6 shadow-xs mt-10">
             <div className="w-12 h-12 bg-[#D0011B]/10 rounded-full flex items-center justify-center shrink-0">
               <AlertTriangle size={24} className="text-[#D0011B]" />
             </div>
@@ -1255,7 +1261,7 @@ export default function LandingPage({ onEnterLogin }: LandingPageProps) {
       </section>
 
       {/* SEÇÃO FAQ */}
-      <section id="faq" className="px-6 py-24 bg-[#fafafc] relative overflow-hidden">
+      <section id="faq" className="px-6 py-24 bg-transparent relative overflow-hidden">
         {/* Subtle decorative flare */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#D0011B]/2 blur-[130px] rounded-full pointer-events-none" />
 
@@ -1274,7 +1280,7 @@ export default function LandingPage({ onEnterLogin }: LandingPageProps) {
           </div>
 
           {/* Interactive Accordion questions container with elegant light style card */}
-          <div className="border border-neutral-200/80 bg-white rounded-[32px] p-6 sm:p-10 flex flex-col h-full shadow-[0_12px_40px_rgba(0,0,0,0.03)]">
+          <div className="glass-obsidian rounded-[32px] p-6 sm:p-10 flex flex-col h-full shadow-[0_12px_40px_rgba(0,0,0,0.03)] border-white/[0.05]">
             <div className="space-y-4 font-sans">
               {[
                 {
@@ -1300,10 +1306,10 @@ export default function LandingPage({ onEnterLogin }: LandingPageProps) {
               ].map((item, idx) => (
                 <div 
                   key={idx}
-                  className="bg-[#f7f8fa]/80 border border-neutral-200/60 rounded-[18px] overflow-hidden cursor-pointer transition-all duration-300 hover:border-[#D0011B]/15 hover:bg-white"
+                  className="bg-white/5 border border-white/10 rounded-[18px] overflow-hidden cursor-pointer transition-all duration-300 hover:border-[#D0011B]/15 hover:bg-white/10"
                   onClick={() => setActiveFaq(activeFaq === idx ? null : idx)}
                 >
-                  <button className="w-full px-6 py-5 flex items-center justify-between text-left transition-colors border-none bg-transparent cursor-pointer">
+                  <button className="w-full px-6 py-5 flex items-center justify-between text-left transition-colors border-none bg-transparent cursor-pointer text-white">
                     <span className="font-semibold text-neutral-850 text-[15px] sm:text-[16px] pr-4">{item.q}</span>
                     <div className={`transition-transform duration-300 text-[#D0011B] shrink-0 ${activeFaq === idx ? 'rotate-180' : ''}`}>
                       <ChevronDown size={20} />
@@ -1344,7 +1350,7 @@ export default function LandingPage({ onEnterLogin }: LandingPageProps) {
       </section>
 
       {/* FINAL CALL TO ACTION SECTOR */}
-      <section className="px-6 py-20 bg-white relative overflow-hidden">
+      <section className="px-6 py-20 bg-transparent relative overflow-hidden">
         {/* Soft radial backlight shading background decorative effects */}
         <div className="absolute inset-0 pointer-events-none opacity-40 bg-[radial-gradient(circle_at_center,rgba(208,1,27,0.06)_0%,transparent_75%)]" />
         
@@ -1395,7 +1401,7 @@ export default function LandingPage({ onEnterLogin }: LandingPageProps) {
       </section>
 
       {/* FOOTER */}
-      <footer className="bg-neutral-50 px-6 py-12 relative overflow-hidden font-sans">
+      <footer className="bg-[#09090B] px-6 py-12 relative overflow-hidden font-sans border-t border-white/[0.05]">
         <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8 relative z-10 text-center md:text-left">
           
           <div className="max-w-xs flex flex-col items-center md:items-start text-center md:text-left">
@@ -1407,7 +1413,7 @@ export default function LandingPage({ onEnterLogin }: LandingPageProps) {
                 className="w-auto shrink-0 select-none"
                 referrerPolicy="no-referrer"
               />
-              <span className="text-[18px] font-black tracking-tight text-gray-900 font-sans">
+              <span className="text-[18px] font-black tracking-tight text-white font-sans">
                 Shop<span className="text-[#D0011B]">Spy</span>
               </span>
             </div>
@@ -1417,10 +1423,10 @@ export default function LandingPage({ onEnterLogin }: LandingPageProps) {
           </div>
 
           <div className="flex flex-wrap justify-center gap-6 text-sm font-bold text-gray-550">
-            <button onClick={() => scrollToSection('inicio')} className="text-gray-500 hover:text-gray-900 cursor-pointer bg-transparent border-none">Início</button>
-            <button onClick={() => scrollToSection('beneficios')} className="text-gray-500 hover:text-gray-900 cursor-pointer bg-transparent border-none">Benefícios</button>
-            <button onClick={() => scrollToSection('planos')} className="text-gray-500 hover:text-gray-900 cursor-pointer bg-transparent border-none">Planos</button>
-            <button onClick={() => scrollToSection('faq')} className="text-gray-500 hover:text-gray-900 cursor-pointer bg-transparent border-none">FAQ</button>
+            <button onClick={() => scrollToSection('inicio')} className="text-gray-500 hover:text-white cursor-pointer bg-transparent border-none">Início</button>
+            <button onClick={() => scrollToSection('beneficios')} className="text-gray-500 hover:text-white cursor-pointer bg-transparent border-none">Benefícios</button>
+            <button onClick={() => scrollToSection('planos')} className="text-gray-500 hover:text-white cursor-pointer bg-transparent border-none">Planos</button>
+            <button onClick={() => scrollToSection('faq')} className="text-gray-500 hover:text-white cursor-pointer bg-transparent border-none">FAQ</button>
           </div>
         </div>
 

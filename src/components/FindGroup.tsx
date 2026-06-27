@@ -370,15 +370,12 @@ const cameraStyles = [
 ];
 
 const influencers = [
-  { id: 'h1', nome: 'Lucas', genero: 'Homem', image: 'https://i.postimg.cc/Pv4T3fNK/Full-body-portrait-of-a-202606111328.jpg' },
-  { id: 'h2', nome: 'Pedro', genero: 'Homem', image: 'https://i.postimg.cc/RJR4sCqQ/Full-body-portrait-of-a-202606111328-(1).jpg' },
-  { id: 'h3', nome: 'Gabriel', genero: 'Homem', image: 'https://i.postimg.cc/LgRm3g44/Full-body-portrait-of-a-202606111328-(3).jpg' },
-  { id: 'h4', nome: 'Rafael', genero: 'Homem', image: 'https://i.postimg.cc/p5xPJ5VP/Full-body-portrait-of-a-202606111328-(6).jpg' },
-  { id: 'f1', nome: 'Ana', genero: 'Mulher', image: 'https://i.postimg.cc/N2YQk2GX/Full-body-portrait-of-a-202606111328-(2).jpg' },
-  { id: 'f2', nome: 'Julia', genero: 'Mulher', image: 'https://i.postimg.cc/9wVcYwXm/Full-body-portrait-of-a-202606111328-(4).jpg' },
-  { id: 'f3', nome: 'Camila', genero: 'Mulher', image: 'https://i.postimg.cc/RJ9vLJCZ/Full-body-portrait-of-a-202606111328-(5).jpg' },
-  { id: 'f4', nome: 'Bruna', genero: 'Mulher', image: 'https://i.postimg.cc/bD1zn9hB/Full-body-portrait-of-a-202606111328-(7).jpg' },
-  { id: 'f5', nome: 'Fernanda', genero: 'Mulher', image: 'https://i.postimg.cc/tn5pSR7N/Full-body-portrait-of-an-202606111328.jpg' },
+  { id: 'h1', nome: '', genero: 'Homem', image: 'https://i.postimg.cc/Vv84Kdq0/Full-body-portrait-of-a-202606211544.jpg' },
+  { id: 'h2', nome: '', genero: 'Homem', image: 'https://i.postimg.cc/j2bvMLHS/Full-body-portrait-of-a-202606211544-(1).jpg' },
+  { id: 'h3', nome: '', genero: 'Homem', image: 'https://i.postimg.cc/L5pvxntm/Full-body-portrait-of-a-202606211544-(2).jpg' },
+  { id: 'h4', nome: '', genero: 'Homem', image: 'https://i.postimg.cc/cHYX7QnK/Full-body-portrait-of-a-202606211544-(3).jpg' },
+  { id: 'f1', nome: '', genero: 'Mulher', image: 'https://i.postimg.cc/9MTJPG7W/Full-body-portrait-of-a-202606211544-(4).jpg' },
+  { id: 'f2', nome: '', genero: 'Mulher', image: 'https://i.postimg.cc/rmWQGSry/Full-body-portrait-of-a-202606111328-8.jpg' },
 ];
 
 const durations = [
@@ -773,7 +770,7 @@ OUTPUT FORMAT: Single JPG image, 9:16 aspect ratio.`;
   };
 
   return (
-    <div className="flex-1 bg-gray-50 dark:bg-[#0a0a0a] p-4 sm:p-6 custom-scrollbar overflow-y-auto font-sans min-h-screen text-gray-900 dark:text-white transition-colors duration-300">
+    <div className="flex-1 bg-transparent p-4 sm:p-6 custom-scrollbar overflow-y-auto font-sans min-h-screen text-white transition-colors duration-300">
       <div className="max-w-4xl mx-auto space-y-6">
         
         {/* Header (Muted except results) */}
@@ -798,7 +795,7 @@ OUTPUT FORMAT: Single JPG image, 9:16 aspect ratio.`;
 
         {/* LOADING SCREEN */}
         {isLoading && (
-          <div className="flex flex-col items-center justify-center p-12 px-6 bg-white dark:bg-[#111111] border border-black/5 dark:border-white/[0.08] rounded-2xl shadow-xl">
+          <div className="flex flex-col items-center justify-center p-12 px-6 glass-obsidian rounded-3xl shadow-2xl">
             <style>{`
               @keyframes rotate-loader {
                 from { transform: rotate(0deg); }
@@ -842,7 +839,7 @@ OUTPUT FORMAT: Single JPG image, 9:16 aspect ratio.`;
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.2 }}
-                className="bg-white dark:bg-[#111111] border border-black/5 dark:border-white/[0.08] rounded-[14px] p-5 sm:p-6 space-y-5 shadow-lg"
+                className="glass-obsidian rounded-[14px] p-5 sm:p-6 space-y-5 shadow-lg"
               >
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-1 border-b border-black/[0.04] dark:border-white/[0.04]">
                   <div className="space-y-1">
@@ -1023,7 +1020,7 @@ OUTPUT FORMAT: Single JPG image, 9:16 aspect ratio.`;
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.2 }}
-                className="bg-white dark:bg-[#111111] border border-black/5 dark:border-white/[0.08] rounded-[14px] p-5 sm:p-6 space-y-7 shadow-lg"
+                className="glass-obsidian rounded-[14px] p-5 sm:p-6 space-y-7 shadow-lg"
               >
                 {/* Cenário do vídeo */}
                 <div className="space-y-4">
@@ -1420,7 +1417,7 @@ OUTPUT FORMAT: Single JPG image, 9:16 aspect ratio.`;
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.2 }}
-                className="bg-white dark:bg-[#111111] border border-black/5 dark:border-white/[0.08] rounded-[14px] p-5 sm:p-6 space-y-7 shadow-lg"
+                className="glass-obsidian rounded-[14px] p-5 sm:p-6 space-y-7 shadow-lg"
               >
                 {/* 1. Duração do vídeo */}
                 <div className="space-y-4">
@@ -1603,7 +1600,7 @@ OUTPUT FORMAT: Single JPG image, 9:16 aspect ratio.`;
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.2 }}
-                className="bg-white dark:bg-[#111111] border border-black/5 dark:border-white/[0.08] rounded-[14px] p-5 sm:p-6 space-y-7 shadow-lg"
+                className="glass-obsidian rounded-[14px] p-5 sm:p-6 space-y-7 shadow-lg"
               >
                 {/* 7. Tom da fala */}
                 <div className="space-y-4">
@@ -1821,7 +1818,7 @@ OUTPUT FORMAT: Single JPG image, 9:16 aspect ratio.`;
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.2 }}
-                className="bg-white dark:bg-[#111111] border border-black/5 dark:border-white/[0.08] rounded-[14px] p-5 sm:p-6 space-y-5 shadow-lg animate-fade-in"
+                className="glass-obsidian rounded-[14px] p-5 sm:p-6 space-y-5 shadow-lg animate-fade-in"
               >
                 <div className="flex items-center gap-1.5">
                   <CheckCircle2 size={16} className="text-green-500" />
@@ -1915,7 +1912,7 @@ OUTPUT FORMAT: Single JPG image, 9:16 aspect ratio.`;
               >
                 
                 {/* Result Indicator Header */}
-                <div className="flex items-center justify-between gap-4 p-4 rounded-xl bg-white dark:bg-[#111111] border border-black/5 dark:border-white/[0.08] shadow-md">
+                <div className="flex items-center justify-between gap-4 p-4 rounded-xl glass-obsidian shadow-md">
                   <div className="flex items-center gap-2.5">
                     <CheckCircle2 className="text-green-500" size={20} />
                     <div>
@@ -1940,7 +1937,7 @@ OUTPUT FORMAT: Single JPG image, 9:16 aspect ratio.`;
                 </div>
 
                 {/* 6.1: Criativo Visual Card */}
-                <div className="bg-white dark:bg-[#111111] border border-black/5 dark:border-white/[0.08] rounded-2xl p-5 shadow-lg flex flex-col sm:flex-row items-center gap-6">
+                <div className="glass-obsidian rounded-2xl p-5 shadow-lg flex flex-col sm:flex-row items-center gap-6">
                   <div className="w-[124px] h-[124px] rounded-xl overflow-hidden border border-black/10 dark:border-white/10 shadow-sm bg-neutral-100 dark:bg-white/5 flex-shrink-0">
                     <img 
                       src={selectedProduct.imagem} 
@@ -1991,7 +1988,7 @@ OUTPUT FORMAT: Single JPG image, 9:16 aspect ratio.`;
 
                 {/* 6.1b: Avatar Referência Card */}
                 {selectedInfluencer && (
-                  <div className="bg-white dark:bg-[#111111] border border-black/5 dark:border-white/[0.08] rounded-2xl p-5 shadow-lg flex flex-col sm:flex-row items-center gap-6">
+                  <div className="glass-obsidian rounded-2xl p-5 shadow-lg flex flex-col sm:flex-row items-center gap-6">
                     <div className="w-[120px] h-[160px] rounded-xl overflow-hidden border border-black/10 dark:border-white/10 shadow-sm bg-neutral-100 dark:bg-white/5 flex-shrink-0">
                       <img 
                         src={selectedInfluencer.image} 
@@ -2027,7 +2024,7 @@ OUTPUT FORMAT: Single JPG image, 9:16 aspect ratio.`;
 
                 {/* 6.1c: Prompt para Mesclar Imagens Card */}
                 {selectedProduct && selectedInfluencer && (
-                  <div className="bg-white dark:bg-[#111111] border border-black/5 dark:border-white/[0.08] rounded-2xl p-5 shadow-lg space-y-4">
+                  <div className="glass-obsidian rounded-2xl p-5 shadow-lg space-y-4">
                     <span className="text-[9px] font-black tracking-[0.1em] bg-indigo-600/10 text-indigo-500 px-2 py-1 rounded uppercase">
                       Prompt para Mesclar Imagens (IA)
                     </span>
@@ -2048,7 +2045,7 @@ OUTPUT FORMAT: Single JPG image, 9:16 aspect ratio.`;
                 )}
 
                 {/* 6.2: Google Flow Prompt Card */}
-                <div className="bg-white dark:bg-[#111111] border border-black/5 dark:border-white/[0.08] rounded-2xl p-5 shadow-lg space-y-4">
+                <div className="glass-obsidian rounded-2xl p-5 shadow-lg space-y-4">
                   <div className="flex justify-between items-start">
                     <span className="text-[9px] font-black tracking-[0.1em] bg-red-600/10 text-[#D0011B] px-2 py-1 rounded uppercase">
                       Prompt Gerado
@@ -2110,7 +2107,7 @@ OUTPUT FORMAT: Single JPG image, 9:16 aspect ratio.`;
                 </div>
 
                 {/* 6.3: Descrição do Produto + Hashtags Card */}
-                <div className="bg-white dark:bg-[#111111] border border-black/5 dark:border-white/[0.08] rounded-2xl p-5 shadow-lg space-y-6">
+                <div className="glass-obsidian rounded-2xl p-5 shadow-lg space-y-6">
                   
                   {/* Descrição do produto */}
                   <div className="space-y-2">

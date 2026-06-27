@@ -182,8 +182,6 @@ export default function Dashboard({ products: productsProp, isDarkMode = true }:
       setUnits(parseSavedInt('shopspy_metric_units', 0));
       setCommissionTotal(parseSavedFloat('shopspy_dashboard_commission', 0));
       
-      // Trigger a re-render of useMemo by forcing a state update if needed
-      // but usually the event itself is enough to trigger the components listening to it
       try {
         const saved = localStorage.getItem('shopspy_recent_sales');
         setRecentSales(saved ? JSON.parse(saved) : []);
@@ -206,51 +204,26 @@ export default function Dashboard({ products: productsProp, isDarkMode = true }:
     localStorage.setItem('shopspy_dashboard_commission', commissionTotal.toFixed(2).replace('.', ','));
   }, [salesTotal, visitors, views, orders, units, commissionTotal]);
 
-  // One-time run to clear legacy metrics and start fresh at 0 as requested
-  useEffect(() => {
-    const isCleared = localStorage.getItem('shopspy_db_reset_done_v5');
-    if (!isCleared) {
-      localStorage.setItem('shopspy_dashboard_sales', '0,00');
-      localStorage.setItem('shopspy_metric_visitors', '0');
-      localStorage.setItem('shopspy_metric_views', '0');
-      localStorage.setItem('shopspy_metric_orders', '0');
-      localStorage.setItem('shopspy_metric_units', '0');
-      localStorage.setItem('shopspy_recent_sales', '[]');
-      localStorage.setItem('shopspy_notifications_enabled', 'false');
-      setSalesTotal(0);
-      setVisitors(0);
-      setViews(0);
-      setOrders(0);
-      setUnits(0);
-      setCommissionTotal(0);
-      setRecentSales([]);
-      localStorage.setItem('shopspy_db_reset_done_v5', 'true');
-      window.dispatchEvent(new CustomEvent('shopspy_settings_updated'));
-    }
-  }, []);
-
   // Live notification Listener for sales event
   useEffect(() => {
     const handleSale = (e: any) => {
       const { price, commissionRate, productId } = e.detail;
       const commission = price * (commissionRate / 100);
 
-      // Use userStorage para manter consistência entre páginas
       if (userStorage) {
-        const currentSales = userStorage.get('TotalVendas') || 0;
-        const currentRevenue = userStorage.get('ReceitaTotal') || 0;
-        const currentCommission = userStorage.get('ComissaoEstimada') || 0;
-        const currentItems = userStorage.get('ItensSold') || 0;
-        const currentClicks = userStorage.get('Cliques') || 0;
+        const currentSales = Number(userStorage.get('TotalVendas') || 0);
+        const currentRevenue = Number(userStorage.get('ReceitaTotal') || 0);
+        const currentCommission = Number(userStorage.get('ComissaoEstimada') || 0);
+        const currentItems = Number(userStorage.get('ItensSold') || 0);
+        const currentClicks = Number(userStorage.get('Cliques') || 0);
 
-        userStorage.set('TotalVendas', currentSales + 1);
-        userStorage.set('ReceitaTotal', currentRevenue + price);
-        userStorage.set('ComissaoEstimada', currentCommission + commission);
-        userStorage.set('ItensSold', currentItems + 1);
-        userStorage.set('Cliques', currentClicks + Math.floor(Math.random() * 5 + 1));
+        userStorage.set('TotalVendas', String(currentSales + 1));
+        userStorage.set('ReceitaTotal', String(currentRevenue + price));
+        userStorage.set('ComissaoEstimada', String(currentCommission + commission));
+        userStorage.set('ItensSold', String(currentItems + 1));
+        userStorage.set('Cliques', String(currentClicks + Math.floor(Math.random() * 5 + 1)));
       }
 
-      // Forçar atualização local dos states se o componente estiver montado
       setSalesTotal(prev => prev + price);
       setOrders(prev => prev + 1);
       setUnits(prev => prev + 1);
@@ -270,23 +243,20 @@ export default function Dashboard({ products: productsProp, isDarkMode = true }:
 
     window.addEventListener('shopspy_sale', handleSale as EventListener);
     return () => window.removeEventListener('shopspy_sale', handleSale as EventListener);
-  }, [activeProducts]);
+  }, [activeProducts, userStorage]);
 
-  // Top 5 Products selection selector 
+  // Top 5 Products selection
   const topProducts = useMemo(() => {
     const top5Ids = JSON.parse(localStorage.getItem('shopspy_top5_products') || '[11,12,13,14,15]');
     const filtered = activeProducts.filter(p => top5Ids.includes(p.id));
     if (filtered.length > 0) {
       return filtered.slice(0, 5);
     }
-    // Fallback sort by ranking
     return [...activeProducts].sort((a, b) => a.ranking - b.ranking).slice(0, 5);
   }, [activeProducts]);
 
-  // Period lists
   const periods = ["Ontem", "Hoje", "Semana", "Mês", "Ano", "Tudo"];
 
-  // Multiplier-based period calculator to dynamically compute realistic sub-period totals
   const currentPeriodData = useMemo(() => {
     const mults: Record<string, { sales: number; visitors: number; views: number; orders: number; units: number; changeSales: string; changeOrders: string; status: string }> = {
       'Hoje': { sales: 0.05, visitors: 0.06, views: 0.06, orders: 0.05, units: 0.05, changeSales: '↗ +4.2%', changeOrders: '↗ +3.5%', status: 'hoje' },
@@ -320,7 +290,6 @@ export default function Dashboard({ products: productsProp, isDarkMode = true }:
     };
   }, [activePeriod, salesTotal, visitors, views, orders, units]);
 
-  // Admin Overrides for Metrics
   const adminMetricsOverride = useMemo(() => {
     const getVal = (key: string) => localStorage.getItem(`shopspy_admin_${key}`);
     const getVar = (key: string) => localStorage.getItem(`shopspy_admin_var_${key}`);
@@ -347,9 +316,8 @@ export default function Dashboard({ products: productsProp, isDarkMode = true }:
       var_valor_pedido: getVar('valor_pedido'),
       var_novos_compradores: getVar('novos_compradores'),
     };
-  }, [salesTotal, visitors, views, orders, units]); // Listen to changes triggered by events
+  }, []);
 
-  // Recharts dynamic chart data based on active Period pill and computed sub-period sale total
   const dynamicChartData = useMemo(() => {
     let labels = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
     let weights = [0.1, 0.15, 0.12, 0.18, 0.22, 0.13, 0.1];
@@ -377,7 +345,6 @@ export default function Dashboard({ products: productsProp, isDarkMode = true }:
     });
   }, [currentPeriodData.sales, activePeriod]);
 
-  // Relative live time formatter matching live indicator mockup screenshot
   const getRelativeLiveTime = useCallback((index: number, timestamp?: number) => {
     if (timestamp) {
       const diffSeconds = Math.floor((Date.now() - timestamp) / 1000);
@@ -387,7 +354,6 @@ export default function Dashboard({ products: productsProp, isDarkMode = true }:
       const diffHours = Math.floor(diffMinutes / 60);
       return `há ${diffHours} ${diffHours === 1 ? 'hora' : 'horas'}`;
     }
-    // Fallback based on relative position matching screenshot layout organically
     if (index === 0) return 'há menos de um minuto';
     if (index === 1) return 'há 1 minuto';
     if (index === 2) return 'há 3 minutos';
@@ -396,7 +362,6 @@ export default function Dashboard({ products: productsProp, isDarkMode = true }:
     return `há ${index * 3} minutos`;
   }, []);
 
-  // Metric grid spec items computed according to the selected period
   const metrics = [
     { 
       label: 'Cliques', 
@@ -448,20 +413,10 @@ export default function Dashboard({ products: productsProp, isDarkMode = true }:
     }
   };
 
-  // Theme support helpers
-  const bgClass = isDarkMode ? 'bg-[#09090B]' : 'bg-[#f8f9fa]';
-  const cardBgClass = isDarkMode ? 'glass-obsidian-card border-white/5' : 'bg-white border-gray-200/60 shadow-sm';
-  const headerIconBg = isDarkMode ? 'bg-white/5' : 'bg-gray-200/70 hover:bg-gray-300/80';
-  const headerIconBorder = isDarkMode ? 'border-white/10' : 'border-gray-200/40';
-  const headerIconColor = isDarkMode ? 'text-white' : 'text-gray-800';
-  const textPrimary = isDarkMode ? 'text-white' : 'text-gray-900';
-  const textMuted = isDarkMode ? 'text-gray-400' : 'text-gray-500';
-  const listHover = isDarkMode ? 'hover:bg-white/5' : 'hover:bg-gray-100/70';
-
   return (
-    <div id="dashboard_view" className={`flex-1 ${bgClass} min-h-screen ${textPrimary} p-6 md:p-8 font-['Space_Grotesk'] overflow-x-hidden transition-colors duration-300 relative`}>
+    <div id="dashboard_view" className={`flex-1 bg-transparent min-h-screen text-white p-6 md:p-8 font-['Space_Grotesk'] overflow-x-hidden transition-colors duration-300 relative`}>
       
-      {/* Visual Sync Overlay with Red Gradient Spinner & Glassmorphism Blur */}
+      {/* Visual Sync Overlay */}
       <AnimatePresence>
         {isRefreshing && (
           <motion.div
@@ -469,35 +424,27 @@ export default function Dashboard({ products: productsProp, isDarkMode = true }:
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-black/60 dark:bg-[#09090B]/85 backdrop-blur-md rounded-2xl"
+            className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-black/60 backdrop-blur-md rounded-2xl"
           >
-            <motion.div
-              initial={{ scale: 0.9, y: 10 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.9, y: 10 }}
-              className="flex flex-col items-center gap-4 bg-white/90 dark:bg-[#111111]/90 border border-black/5 dark:border-white/[0.08] p-8 rounded-2xl shadow-2xl max-w-sm text-center"
-            >
+            <div className="flex flex-col items-center gap-4 glass-obsidian p-8 rounded-2xl shadow-2xl max-w-sm text-center">
               <div className="relative w-14 h-14">
-                {/* Underlay glow ring */}
-                <div className="absolute inset-0 rounded-full border-4 border-neutral-200 dark:border-white/10" />
-                {/* Rotating neon red gradient ring */}
+                <div className="absolute inset-0 rounded-full border-4 border-white/10" />
                 <motion.div 
-                  className="absolute inset-0 rounded-full border-4 border-t-[#D0011B] border-r-[#D0011B] border-transparent"
-                  animate={{ rotate: 360 }}
-                  transition={{ repeat: Infinity, duration: 0.75, ease: "linear" }}
+                   className="absolute inset-0 rounded-full border-4 border-t-[#D0011B] border-r-[#D0011B] border-transparent"
+                   animate={{ rotate: 360 }}
+                   transition={{ repeat: Infinity, duration: 0.75, ease: "linear" }}
                 />
-                {/* Center glowing dot */}
                 <div className="absolute inset-[15px] bg-[#D0011B] rounded-full animate-pulse shadow-[0_0_12px_#D0011B]" />
               </div>
               <div className="space-y-1">
-                <h3 className="text-sm font-black text-gray-900 dark:text-white uppercase tracking-wider">
+                <h3 className="text-sm font-black text-white uppercase tracking-wider">
                   Sincronizando Dados
                 </h3>
-                <p className="text-[12px] text-gray-500 dark:text-gray-400">
+                <p className="text-[12px] text-white/50">
                   Carregando as últimas métricas do banco de dados...
                 </p>
               </div>
-            </motion.div>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -508,35 +455,31 @@ export default function Dashboard({ products: productsProp, isDarkMode = true }:
           <h1 id="db_main_title" className={`text-[28px] font-black uppercase tracking-tight gradient-title m-0`}>
             Dashboard
           </h1>
-          <p className={`text-[14px] ${textMuted} mt-1 m-0`}>
+          <p className={`text-[14px] text-white/50 mt-1 m-0`}>
             Acompanhe suas vendas e métricas em tempo real.
           </p>
         </div>
 
-        {/* Lado direito: 3 ícones circulares */}
         <div className="flex items-center gap-3">
           <button 
-            id="header_icon_refresh"
             onClick={handleRefresh}
-            className={`w-[36px] h-[36px] rounded-full ${headerIconBg} border ${headerIconBorder} flex items-center justify-center ${headerIconColor} transition-all duration-300 ${isRefreshing ? 'animate-spin' : 'hover:scale-105 active:scale-95'}`}
+            className={`w-[36px] h-[36px] rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white transition-all duration-300 ${isRefreshing ? 'animate-spin' : 'hover:scale-105 active:scale-95'}`}
             title="Sincronizar dados"
           >
             <RefreshCw size={16} />
           </button>
           <button 
-            id="header_icon_eye"
             onClick={() => {
               const next = !showValues;
               setShowValues(next);
               localStorage.setItem('shopspy_show_values', String(next));
             }}
-            className={`w-[36px] h-[36px] rounded-full ${headerIconBg} border ${headerIconBorder} flex items-center justify-center ${headerIconColor} hover:scale-105 active:scale-95 transition-all`}
+            className={`w-[36px] h-[36px] rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white hover:scale-105 active:scale-95 transition-all`}
             title={showValues ? "Ocultar valores" : "Mostrar valores"}
           >
             {showValues ? <Eye size={16} /> : <EyeOff size={16} />}
           </button>
           <button 
-            id="header_icon_dollar"
             onClick={() => {
               const currencies: ('BRL' | 'USD' | 'EUR')[] = ['BRL', 'USD', 'EUR'];
               const currentIndex = currencies.indexOf(activeCurrency);
@@ -544,7 +487,7 @@ export default function Dashboard({ products: productsProp, isDarkMode = true }:
               setActiveCurrency(nextCurrency);
               localStorage.setItem('shopspy_currency', nextCurrency);
             }}
-            className={`w-[36px] h-[36px] rounded-full ${headerIconBg} border ${headerIconBorder} flex items-center justify-center ${headerIconColor} hover:scale-105 active:scale-95 transition-all text-xs font-bold`}
+            className={`w-[36px] h-[36px] rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white hover:scale-105 active:scale-95 transition-all text-xs font-bold`}
             title={`Alterar moeda (Atual: ${activeCurrency})`}
           >
             {activeCurrency === 'BRL' && <span>R$</span>}
@@ -555,129 +498,68 @@ export default function Dashboard({ products: productsProp, isDarkMode = true }:
       </div>
 
       {/* FILTRO DE PERÍODO */}
-      <div className={`mt-6 flex flex-wrap items-center gap-2 ${isDarkMode ? 'bg-white/5 border-white/10 backdrop-blur-md shadow-inner' : 'bg-white border-gray-200 shadow-sm'} p-1.5 rounded-full border max-w-fit transition-colors duration-300`}>
+      <div className={`mt-6 flex flex-wrap items-center gap-2 bg-white/5 border border-white/10 backdrop-blur-md shadow-inner p-1.5 rounded-full max-w-fit transition-colors duration-300`}>
         {periods.map(period => (
           <button
             key={period}
             onClick={() => setActivePeriod(period)}
-            style={activePeriod === period ? {
-              background: 'linear-gradient(180deg, #E21B33 0%, #D0011B 50%, #B00014 100%)',
-              color: '#ffffff',
-              border: '1px solid rgba(255, 255, 255, 0.15)',
-              boxShadow: '0 4px 15px rgba(208, 1, 27, 0.4), inset 0 1.5px 3px rgba(255, 255, 255, 0.2)',
-            } : {}}
             className={`px-4 py-1.5 text-xs transition-all duration-300 border-none cursor-pointer rounded-full ${
               activePeriod === period 
-                ? 'font-black text-white shadow-lg scale-105' 
-                : `bg-transparent ${textMuted} hover:text-white hover:bg-white/5`
+                ? 'bg-gradient-to-r from-[#D0011B] to-[#ff4444] font-black text-white shadow-[0_4px_12px_rgba(208,1,27,0.3)] scale-105' 
+                : `bg-transparent text-white/40 hover:text-white hover:bg-white/5`
             }`}
           >
             {period}
           </button>
         ))}
-        {/* Ícone Calendário */}
-        <div className={`px-2 ${textMuted} flex items-center`}>
+        <div className={`px-2 text-white/30 flex items-center`}>
           <Calendar size={14} />
         </div>
       </div>
 
-      {/* GRID 4 CARDS COLORIDOS - RESPONSIVO */}
+      {/* GRID 4 CARDS COLORIDOS */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
-        
-        {/* Card 1 — Total de Vendas */}
-        <div className="bg-[#22c55e] rounded-[16px] p-6 relative overflow-hidden h-[155px] flex flex-col justify-between shadow-lg">
-          {/* Círculo decorativo */}
-          <div className="absolute right-[-20px] bottom-[-20px] bg-white/10 rounded-full select-none pointer-events-none" style={{ width: '120px', height: '120px' }}></div>
-          {/* Ícone no canto superior direito */}
-          <div className="absolute top-4 right-4 w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
-            <ShoppingCart size={24} className="text-white" />
+        {[
+          { label: 'Vendas Entregues', value: adminMetricsOverride.total_vendas || currentPeriodData.orders, change: adminMetricsOverride.var_total_vendas || currentPeriodData.changeOrders, color: 'bg-emerald-500', icon: ShoppingCart },
+          { label: 'Receita no Período', value: adminMetricsOverride.receita_total ? (activeCurrency === 'BRL' ? `R$ ${adminMetricsOverride.receita_total}` : formatCurrency(parseSavedFloat('shopspy_admin_receita_total', 0))) : formatCurrency(currentPeriodData.sales), change: adminMetricsOverride.var_receita_total || currentPeriodData.changeSales, color: 'bg-green-600', icon: DollarSign },
+          { label: 'Vendas Pendentes', value: adminMetricsOverride.vendas_pendentes || Math.round(currentPeriodData.orders * 0.08), change: adminMetricsOverride.var_vendas_pendentes || 'Aguardando pagamento', color: 'bg-amber-500', icon: Clock },
+          { label: 'Vendas Canceladas', value: adminMetricsOverride.vendas_falhadas || Math.round(currentPeriodData.orders * 0.03), change: adminMetricsOverride.var_vendas_falhadas || 'Não aprovadas', color: 'bg-red-500', icon: AlertCircle },
+        ].map((card, i) => (
+          <div key={i} className={`${card.color} rounded-[16px] p-6 relative overflow-hidden h-[155px] flex flex-col justify-between shadow-lg shadow-${card.color.split('-')[1]}-500/10`}>
+            <div className="absolute right-[-20px] bottom-[-20px] bg-white/10 rounded-full w-[120px] h-[120px] select-none pointer-events-none" />
+            <div className="absolute top-4 right-4 w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+              <card.icon size={24} className="text-white" />
+            </div>
+            <div>
+              <span className="text-[14px] text-white/90 font-medium leading-tight">{card.label}</span>
+              <h2 className="text-[28px] font-black text-white mt-1 leading-none truncate pr-8">
+                {formatNumberHidden(card.value)}
+              </h2>
+            </div>
+            <span className="text-[12px] text-white/70 relative z-10">
+              {card.change} vs. anterior ({currentPeriodData.status})
+            </span>
           </div>
-          <div>
-            <span className="text-[14px] text-white/90 font-medium leading-tight">Vendas Entregues</span>
-            <h2 className="text-[32px] font-black text-white mt-1 leading-none">
-              {showValues ? (adminMetricsOverride.total_vendas || currentPeriodData.orders) : '••••'}
-            </h2>
-          </div>
-          <span className="text-[12px] text-white/70 relative z-10">
-            {adminMetricsOverride.var_total_vendas || currentPeriodData.changeOrders} vs. anterior ({currentPeriodData.status})
-          </span>
-        </div>
-
-        {/* Card 2 — Receita Total */}
-        <div className="bg-[#16a34a] rounded-[16px] p-6 relative overflow-hidden h-[155px] flex flex-col justify-between shadow-lg">
-          <div className="absolute right-[-20px] bottom-[-20px] bg-white/10 rounded-full select-none pointer-events-none" style={{ width: '120px', height: '120px' }}></div>
-          <div className="absolute top-4 right-4 w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
-            {activeCurrency === 'BRL' && <span className="text-white font-black text-xl absolute">R$</span>}
-            {activeCurrency === 'USD' && <DollarSign size={24} className="text-white" />}
-            {activeCurrency === 'EUR' && <Euro size={24} className="text-white" />}
-          </div>
-          <div>
-            <span className="text-[14px] text-white/90 font-medium leading-tight">Receita no Período</span>
-            <h2 className="text-[28px] md:text-[32px] font-black text-white mt-1 leading-none truncate">
-              {showValues ? (adminMetricsOverride.receita_total ? (activeCurrency === 'BRL' ? `R$ ${adminMetricsOverride.receita_total}` : formatCurrency(parseSavedFloat('shopspy_admin_receita_total', 0))) : formatCurrency(currentPeriodData.sales)) : '••••'}
-            </h2>
-          </div>
-          <span className="text-[12px] text-white/70 relative z-10">
-            {adminMetricsOverride.var_receita_total || currentPeriodData.changeSales} vs. anterior ({currentPeriodData.status})
-          </span>
-        </div>
-
-        {/* Card 3 — Vendas Pendentes */}
-        <div className="bg-[#f59e0b] rounded-[16px] p-6 relative overflow-hidden h-[155px] flex flex-col justify-between shadow-lg">
-          <div className="absolute right-[-20px] bottom-[-20px] bg-white/10 rounded-full select-none pointer-events-none" style={{ width: '120px', height: '120px' }}></div>
-          <div className="absolute top-4 right-4 w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
-            <Clock size={24} className="text-white" />
-          </div>
-          <div>
-            <span className="text-[14px] text-white/90 font-medium leading-tight">Vendas Pendentes</span>
-            <h2 className="text-[32px] font-black text-white mt-1 leading-none">
-              {showValues ? (adminMetricsOverride.vendas_pendentes || Math.round(currentPeriodData.orders * 0.08)) : '••••'}
-            </h2>
-          </div>
-          <span className="text-[12px] text-white/70 relative z-10">
-            {adminMetricsOverride.var_vendas_pendentes || 'Aguardando pagamento'} ({currentPeriodData.status})
-          </span>
-        </div>
-
-        {/* Card 4 — Vendas Falhadas */}
-        <div className="bg-[#ef4444] rounded-[16px] p-6 relative overflow-hidden h-[155px] flex flex-col justify-between shadow-lg">
-          <div className="absolute right-[-20px] bottom-[-20px] bg-white/10 rounded-full select-none pointer-events-none" style={{ width: '120px', height: '120px' }}></div>
-          <div className="absolute top-4 right-4 w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
-            <AlertCircle size={24} className="text-white" />
-          </div>
-          <div>
-            <span className="text-[14px] text-white/90 font-medium leading-tight">Vendas Canceladas</span>
-            <h2 className="text-[32px] font-black text-white mt-1 leading-none">
-              {showValues ? (adminMetricsOverride.vendas_falhadas || Math.round(currentPeriodData.orders * 0.03)) : '••••'}
-            </h2>
-          </div>
-          <span className="text-[12px] text-white/70 relative z-10">
-            {adminMetricsOverride.var_vendas_falhadas || 'Não aprovadas'} ({currentPeriodData.status})
-          </span>
-        </div>
-
+        ))}
       </div>
 
       {/* GRID DE MÉTRICAS */}
       <div className="mt-8">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {metrics.map((metric, i) => (
-            <div 
-              key={i}
-              className={`${cardBgClass} border rounded-xl p-4 flex flex-col justify-between min-h-[110px] transition-all`}
-            >
+            <div key={i} className={`glass-obsidian p-5 flex flex-col justify-between min-h-[110px] transition-all hover:border-[#D0011B]/30`}>
               <div className="flex justify-between items-start">
-                <span className={`text-[12px] ${textMuted} font-medium`}>
+                <span className={`text-[12px] text-white/50 font-black uppercase tracking-widest`}>
                   {metric.label}
                 </span>
                 {getMetricIcon(metric.icon)}
               </div>
               <div className="mt-2 flex items-baseline justify-between">
-                <span className={`text-2xl font-bold ${textPrimary} tracking-tight`}>
+                <span className={`text-2xl font-black text-white tracking-tighter`}>
                   {metric.value}
                 </span>
                 {metric.change && (
-                  <span className="text-[11px] text-[#22c55e] font-medium ml-1">
+                  <span className="text-[11px] text-emerald-400 font-bold ml-1">
                     {metric.change}
                   </span>
                 )}
@@ -687,25 +569,23 @@ export default function Dashboard({ products: productsProp, isDarkMode = true }:
         </div>
       </div>
 
-      {/* SEÇÃO INFERIOR — 2 colunas lado a lado */}
+      {/* SEÇÃO INFERIOR */}
       <div className="grid grid-cols-1 lg:grid-cols-10 gap-6 mt-8">
         
-        {/* Coluna esquerda (60%) — Gráfico de Vendas */}
-        <div className={`lg:col-span-6 ${cardBgClass} border rounded-[14px] p-5 flex flex-col justify-between transition-all`}>
+        {/* Gráfico de Vendas */}
+        <div className={`lg:col-span-6 glass-obsidian p-6 flex flex-col justify-between transition-all`}>
           <div>
             <div className="flex items-center gap-2">
               <BarChart2 className="text-[#D0011B]" size={18} />
-              <h3 className={`font-bold ${textPrimary} text-base m-0`}>Vendas</h3>
+              <h3 className={`font-black text-white uppercase tracking-widest text-sm m-0`}>Vendas</h3>
             </div>
-            <p className={`text-xs ${textMuted} mt-1 m-0`}>
-              Receita no período selecionado
-            </p>
-            <h2 className={`text-[32px] font-black ${textPrimary} mt-4 tracking-tight`}>
+            <p className={`text-xs text-white/40 mt-1 m-0`}>Receita no período selecionado</p>
+            <h2 className={`text-[32px] font-black text-white mt-4 tracking-tight`}>
               {formatCurrency(currentPeriodData.sales)}
             </h2>
           </div>
 
-          <div className="h-[200px] mt-4 w-full">
+          <div className="h-[220px] mt-6 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={dynamicChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <defs>
@@ -714,35 +594,35 @@ export default function Dashboard({ products: productsProp, isDarkMode = true }:
                     <stop offset="95%" stopColor="#D0011B" stopOpacity={0}/>
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isDarkMode ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.06)"} />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.04)" />
                 <XAxis 
                   dataKey="name" 
                   axisLine={false} 
                   tickLine={false} 
-                  tick={{ fontSize: 10, fill: isDarkMode ? '#666' : '#888' }} 
+                  tick={{ fontSize: 10, fill: '#666' }} 
                 />
                 <YAxis 
                   axisLine={false} 
                   tickLine={false} 
-                  tick={{ fontSize: 10, fill: isDarkMode ? '#666' : '#888' }} 
+                  tick={{ fontSize: 10, fill: '#666' }} 
                 />
                 <Tooltip 
                   formatter={(value: any) => [formatCurrency(Number(value)), 'Vendas']}
                   contentStyle={{ 
-                    borderRadius: '8px', 
-                    border: isDarkMode ? '1.5px solid rgba(255,255,255,0.08)' : '1.5px solid rgba(0,0,0,0.06)', 
-                    boxShadow: '0 8px 30px rgba(0,0,0,0.15)',
-                    backgroundColor: isDarkMode ? '#111111' : '#ffffff',
-                    color: isDarkMode ? '#ffffff' : '#111111'
+                    borderRadius: '12px', 
+                    border: '1px solid rgba(255,255,255,0.1)', 
+                    boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+                    backgroundColor: '#09090B',
+                    color: '#ffffff'
                   }}
-                  itemStyle={{ color: isDarkMode ? '#fff' : '#111' }}
-                  labelStyle={{ color: isDarkMode ? '#aaa' : '#666' }}
+                  itemStyle={{ color: '#fff' }}
+                  labelStyle={{ color: '#aaa', fontWeight: 'bold' }}
                 />
                 <Area 
                   type="monotone" 
                   dataKey="value" 
                   stroke="#D0011B" 
-                  strokeWidth={2.5}
+                  strokeWidth={3}
                   fillOpacity={1}
                   fill="url(#colorSalesRed)" 
                 />
@@ -751,125 +631,63 @@ export default function Dashboard({ products: productsProp, isDarkMode = true }:
           </div>
         </div>
 
-        {/* Coluna direita (40%) — Vendas Recentes + Top 5 */}
+        {/* Vendas ao Vivo */}
         <div className="lg:col-span-4 flex flex-col gap-6">
-          
-          {/* Card "Vendas ao Vivo" */}
-          <div className={`${cardBgClass} border rounded-[14px] p-5 transition-all relative overflow-hidden`}>
-            <div className="flex items-center justify-between mb-4">
+          <div className={`glass-obsidian p-6 transition-all relative overflow-hidden`}>
+            <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-2">
                 <Radio className="text-[#10b981] animate-pulse" size={18} />
-                <h3 className={`font-bold ${textPrimary} text-base m-0`}>Vendas ao Vivo</h3>
+                <h3 className={`font-black text-white uppercase tracking-widest text-sm m-0`}>Vendas ao Vivo</h3>
               </div>
-              <span className="inline-flex items-center gap-1.5 text-[10px] font-black tracking-widest text-[#10b981] bg-[#10b981]/15 px-2.5 py-0.5 rounded-full select-none uppercase">
+              <span className="inline-flex items-center gap-1.5 text-[10px] font-black tracking-widest text-[#10b981] bg-[#10b981]/10 px-2.5 py-1 rounded-full uppercase border border-[#10b981]/20">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#10b981] animate-pulse" />
-                Ao Vivo
+                AO VIVO
               </span>
             </div>
 
-            {/* Total Commission and Count Panel styled exactly like the green box mockup */}
-            <div className="bg-[#10b981]/10 dark:bg-[#10b981]/5 border border-[#10b981]/20 dark:border-[#10b981]/10 rounded-[12px] p-3 flex items-center justify-between gap-4 mb-4">
+            <div className="bg-emerald-500/5 border border-emerald-500/10 rounded-[14px] p-4 flex items-center justify-between gap-4 mb-6">
               <div>
-                <span className="text-[10px] uppercase font-bold tracking-wider text-[#10b981]/70 dark:text-[#10b981]/90 block leading-tight">
-                  Total Comissões
-                </span>
-                <h4 className="text-[20px] font-black text-[#10b981] mt-1 m-0 leading-none">
-                  {formatCurrency(commissionTotal)}
-                </h4>
+                <span className="text-[10px] uppercase font-black tracking-widest text-emerald-400 mb-1 block">Total Comissões</span>
+                <h4 className="text-2xl font-black text-emerald-400 m-0 leading-none">{formatCurrency(commissionTotal)}</h4>
               </div>
               <div className="text-right">
-                <span className="text-[10px] uppercase font-bold tracking-wider text-gray-400 dark:text-gray-500 block leading-tight">
-                  Vendas
-                </span>
-                <h4 className="text-[20px] font-black text-gray-900 dark:text-white mt-1 m-0 leading-none">
-                  {formatNumberHidden(orders)}
-                </h4>
+                <span className="text-[10px] uppercase font-bold tracking-widest text-white/30 mb-1 block">Vendas</span>
+                <h4 className="text-2xl font-black text-white m-0 leading-none">{formatNumberHidden(orders)}</h4>
               </div>
             </div>
 
-            <div className="min-h-[140px] max-h-[220px] overflow-y-auto custom-scrollbar flex flex-col gap-3">
-              {recentSales.map((sale, index) => (
-                <div 
-                  key={sale.id}
-                  className={`flex items-center justify-between gap-3 p-2 rounded-lg ${listHover} transition-colors animate-[fadeIn_0.3s_ease]`}
-                >
+            <div className="min-h-[140px] max-h-[300px] overflow-y-auto glass-obsidian-scroll flex flex-col gap-3 pr-2">
+              {recentSales.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-10 opacity-30">
+                   <ShoppingCart size={32} className="mb-2" />
+                   <p className="text-xs font-bold uppercase tracking-widest">Nenhuma venda recente</p>
+                </div>
+              ) : recentSales.map((sale, index) => (
+                <div key={sale.id} className={`flex items-center justify-between gap-3 p-3 rounded-xl hover:bg-white/[0.04] transition-colors border border-transparent hover:border-white/5`}>
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-8 h-8 rounded-full bg-[#10b981]/10 dark:bg-[#10b981]/15 border border-[#10b981]/20 dark:border-[#10b981]/10 flex items-center justify-center text-[#10b981] text-xs font-black shrink-0 shadow-sm">
+                    <div className="w-10 h-10 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 text-sm font-black shrink-0">
                       $
                     </div>
                     <div className="min-w-0">
-                      <p className={`text-[13px] font-black ${textPrimary} truncate m-0 leading-tight`}>
-                        {sale.product.nome}
+                      <p className="text-[13px] font-bold text-white truncate leading-tight">
+                        {sale.product.name}
                       </p>
-                      <span className={`text-[11px] ${textMuted} block mt-0.5 leading-none`}>
+                      <p className="text-[11px] text-white/40 font-medium">
                         {getRelativeLiveTime(index, sale.timestamp)}
-                      </span>
+                      </p>
                     </div>
                   </div>
-                  <span className="text-[13px] font-black text-[#10b981] flex-shrink-0 tracking-tight">
-                    + {formatCurrency(sale.price * 0.1)}
-                  </span>
-                </div>
-              ))}
-
-              {recentSales.length === 0 && (
-                <div className="flex flex-col items-center justify-center py-8 text-center text-gray-500">
-                  <span className="relative flex h-3 w-3 mb-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#10b981] opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-3 w-3 bg-[#10b981]"></span>
-                  </span>
-                  <p className="text-xs m-0 font-medium">Aguardando vendas ao vivo...</p>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Card "Top 5 Produtos" */}
-          <div className={`${cardBgClass} border rounded-[14px] p-5 transition-all`}>
-            <h3 className={`font-bold ${textPrimary} text-base m-0`}>Top 5 Produtos</h3>
-            
-            <div className="mt-4 flex flex-col gap-3">
-              {topProducts.map((product, index) => (
-                <div 
-                  key={product.id}
-                  className="flex items-center gap-3"
-                >
-                  <span className="text-[14px] font-black text-[#D0011B] w-5">
-                    #{index + 1}
-                  </span>
-                  <img 
-                    src={product.imagem} 
-                    alt={product.nome}
-                    className="w-9 h-9 rounded-md object-cover flex-shrink-0"
-                    referrerPolicy="no-referrer"
-                  />
-                  <div className="flex-1 min-w-0">
-                    <p className={`text-[13px] font-medium ${textPrimary} truncate m-0`}>
-                      {product.nome}
+                  <div className="text-right shrink-0">
+                    <p className="text-[14px] font-black text-emerald-400">
+                      {formatCurrency(sale.price * (sale.product.commission_rate / 100))}
                     </p>
-                    <span className={`text-[11px] ${textMuted} block mt-0.5`}>
-                      {product.vendas} vendidos
-                    </span>
                   </div>
-                  <span className={`text-[13px] font-bold ${textPrimary} flex-shrink-0`}>
-                    {formatProductPrice(product.preco)}
-                  </span>
                 </div>
               ))}
             </div>
           </div>
-
         </div>
-
       </div>
-
-      {/* Animation classes helper */}
-      <style>{`
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(8px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-      `}</style>
     </div>
   );
 }

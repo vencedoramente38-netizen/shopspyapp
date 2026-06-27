@@ -26,7 +26,7 @@ const Settings: React.FC<SettingsProps> = ({ isDarkMode, toggleTheme }) => {
   };
 
   return (
-    <div className="flex-1 bg-gray-50 dark:bg-[#0a0a0a] p-6 min-h-screen font-sans transition-colors duration-300">
+    <div className="flex-1 bg-transparent p-6 min-h-screen font-sans transition-colors duration-300">
       <div className="max-w-4xl mx-auto space-y-6">
         
         {/* Header */}
@@ -53,7 +53,7 @@ const Settings: React.FC<SettingsProps> = ({ isDarkMode, toggleTheme }) => {
         </AnimatePresence>
 
         {/* Card 1: Aparência */}
-        <section className="bg-white dark:bg-[#111111] border border-gray-200 dark:border-white/[0.08] rounded-[14px] p-5 shadow-sm transition-colors">
+        <section className="glass-obsidian rounded-[14px] p-5 shadow-sm transition-colors">
           <div className="flex items-center gap-2 mb-3">
             <Palette size={20} className="text-[#D0011B]" />
             <h2 className="text-[15px] font-bold text-gray-900 dark:text-white font-sans">Aparência</h2>
@@ -64,7 +64,7 @@ const Settings: React.FC<SettingsProps> = ({ isDarkMode, toggleTheme }) => {
           {/* Item Toggle Modo Claro/Escuro */}
           <div 
             onClick={toggleTheme}
-            className="flex items-center justify-between p-3.5 bg-gray-50 dark:bg-[#1a1a1a] rounded-[10px] transition-colors cursor-pointer group"
+            className="flex items-center justify-between p-3.5 bg-white/5 rounded-[10px] transition-colors cursor-pointer group"
           >
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 rounded-lg bg-[#D0011B]/10 flex items-center justify-center text-[#D0011B] group-hover:scale-110 transition-transform">
@@ -95,13 +95,7 @@ const Settings: React.FC<SettingsProps> = ({ isDarkMode, toggleTheme }) => {
 
         {/* ÁREA ADMINISTRATIVA */}
         {localStorage.getItem('shopspy_is_admin') === 'true' && (
-          <div style={{
-            marginTop: 32,
-            background: '#111111',
-            border: '1px solid rgba(208,1,27,0.2)',
-            borderRadius: 14,
-            padding: 20
-          }}>
+          <div className="mt-8 glass-obsidian !border-[#D0011B]/20 rounded-[14px] p-5">
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
               <Shield size={18} color="#D0011B" />
               <span style={{ color: 'white', fontWeights: 700, fontSize: 15 }}>Área Administrativa</span>
