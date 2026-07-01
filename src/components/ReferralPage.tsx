@@ -101,7 +101,7 @@ export default function ReferralPage({ isOpen, onClose, onNotification }: Referr
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 15 }}
           transition={{ duration: 0.25, ease: 'easeOut' }}
-          className="w-full max-w-[580px] bg-[#09090B] border border-white/[0.08] rounded-[24px] shadow-2xl relative overflow-hidden flex flex-col"
+          className="w-full max-w-[580px] bg-white dark:bg-[#09090B] border border-black/5 dark:border-white/[0.08] rounded-[24px] shadow-2xl relative overflow-hidden flex flex-col"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header Section with Pink/Red Gradient */}
@@ -177,7 +177,7 @@ export default function ReferralPage({ isOpen, onClose, onNotification }: Referr
                     {/* Lucrar Card */}
                     <button
                       onClick={() => setStep('lucrar')}
-                      className="w-full relative flex items-center gap-6 p-6 glass-obsidian border-white/[0.08] hover:border-[#D0011B]/40 rounded-[24px] group transition-all cursor-pointer"
+                      className="w-full relative flex items-center gap-6 p-6 glass-obsidian border-black/5 dark:border-white/[0.08] hover:border-[#D0011B]/40 rounded-[24px] group transition-all cursor-pointer"
                     >
                       <div className="w-14 h-14 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-[#D0011B] group-hover:scale-110 transition-transform">
                         <TrendingUp size={24} />
@@ -196,7 +196,7 @@ export default function ReferralPage({ isOpen, onClose, onNotification }: Referr
                     {/* Presentear Card */}
                     <button
                       onClick={() => setStep('presentear')}
-                      className="w-full relative flex items-center gap-6 p-6 glass-obsidian border-white/[0.08] hover:border-[#D0011B]/40 rounded-[24px] group transition-all cursor-pointer shadow-[0_0_40px_rgba(208,1,27,0.05)]"
+                      className="w-full relative flex items-center gap-6 p-6 glass-obsidian border-black/5 dark:border-white/[0.08] hover:border-[#D0011B]/40 rounded-[24px] group transition-all cursor-pointer shadow-[0_0_40px_rgba(208,1,27,0.05)]"
                     >
                       <div className="w-14 h-14 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-[#D0011B] group-hover:scale-110 transition-transform">
                         <Gift size={24} />
@@ -228,7 +228,7 @@ export default function ReferralPage({ isOpen, onClose, onNotification }: Referr
                   <div className="flex justify-center">
                     <button
                       onClick={handleBackToSelect}
-                      className="glass-obsidian-pill bg-white/5 border-white/10 text-white/50 hover:text-white uppercase font-black text-[10px] tracking-widest gap-2"
+                      className="glass-obsidian-pill bg-black/5 dark:bg-white/5 border-black/5 dark:border-white/10 text-gray-500 dark:text-white/50 hover:text-gray-900 dark:hover:text-white uppercase font-black text-[10px] tracking-widest gap-2"
                     >
                       <ArrowLeft size={14} />
                       <span>Trocar Modo</span>
@@ -262,11 +262,11 @@ export default function ReferralPage({ isOpen, onClose, onNotification }: Referr
                       ))}
                     </div>
 
-                    <div className="glass-obsidian border-white/[0.08] p-6 space-y-6">
+                    <div className="glass-obsidian border-black/5 dark:border-white/[0.08] p-6 space-y-6">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                            <Gift size={16} className="text-[#D0011B]" />
-                           <span className="text-[11px] font-black text-white uppercase tracking-widest">Vagas no cupom</span>
+                           <span className="text-[11px] font-black text-gray-900 dark:text-white uppercase tracking-widest">Vagas no cupom</span>
                         </div>
                         <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Limite: 10</span>
                       </div>
@@ -284,7 +284,7 @@ export default function ReferralPage({ isOpen, onClose, onNotification }: Referr
                               className="w-full h-1.5 rounded-lg appearance-none bg-[#D0011B]/20 accent-[#D0011B] cursor-pointer outline-none"
                             />
                           </div>
-                          <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center font-black text-white text-lg">
+                          <div className="w-12 h-12 rounded-xl bg-black/5 dark:bg-white/5 border-black/5 dark:border-white/10 flex items-center justify-center font-black text-gray-900 dark:text-white text-lg">
                             {step === 'presentear' ? vagasPresente : vagasLucro}
                           </div>
                         </div>

@@ -64,25 +64,6 @@ export default function ProductsHeader({ products, activeCategory, setActiveCate
         <p className="text-[13px] text-gray-500 dark:text-white/45"> Central de Mineração — Descubra produtos com alto potencial na Shopee </p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 mt-4">
-        {stats.map((stat, i) => (
-          <div 
-            key={i} 
-            className="relative overflow-hidden flex items-center gap-4 pl-6 pr-4 py-4 bg-white dark:bg-gradient-to-br dark:from-[#121212] dark:to-[#0a0a0a] rounded-xl border border-[#D0011B]/15 dark:border-white/[0.08] shadow-[0_12px_28px_rgba(208,1,27,0.08)] dark:shadow-none -translate-y-[3px] transition-all duration-300 hover:-translate-y-[5px] hover:border-[#D0011B]/30 dark:hover:border-white/20"
-          >
-            {/* Left accent bar for high-end feel */}
-            <div className={`absolute left-0 top-0 bottom-0 w-[5px] ${stat.accent}`} />
-            
-            <div className={`w-10 h-10 rounded-lg ${stat.color} flex items-center justify-center shrink-0`}>
-              <stat.icon size={20} />
-            </div>
-            <div>
-              <div className="text-2xl font-black text-gray-900 dark:text-white leading-none tracking-tight">{stat.value}</div>
-              <div className="text-[11px] font-bold text-gray-500 dark:text-white/45 mt-1 hover:text-[#D0011B] dark:hover:text-white transition-colors duration-200">{stat.label}</div>
-            </div>
-          </div>
-        ))}
-      </div>
 
       <div className="mt-4 relative">
         <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-white/30" />

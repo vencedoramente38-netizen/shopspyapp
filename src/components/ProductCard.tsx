@@ -59,12 +59,12 @@ export default function ProductCard({
         />
         
         {/* Badge TOP #N */}
-        <div className="absolute top-3 left-3 px-3 py-1 bg-black/60 backdrop-blur-md text-white text-[11px] font-black rounded-lg z-10 shadow-lg border border-white/10 uppercase tracking-wider">
-          TOP #{product.ranking}
+        <div className="absolute top-3 left-3 px-3 py-1 bg-black/60 backdrop-blur-md text-white text-[11px] font-bold rounded-lg z-10 shadow-lg border border-white/10 tracking-wider">
+          Top #{product.ranking}
         </div>
 
         {/* Badge CATEGORIA */}
-        <div className="absolute top-3 right-3 px-3 py-1 bg-black/60 backdrop-blur-md text-white text-[10px] font-black rounded-lg z-10 shadow-lg border border-white/10 uppercase tracking-widest">
+        <div className="absolute top-3 right-3 px-3 py-1 bg-black/60 backdrop-blur-md text-white text-[10px] font-bold rounded-lg z-10 shadow-lg border border-white/10 tracking-widest">
           {product.categoria}
         </div>
 
@@ -81,20 +81,20 @@ export default function ProductCard({
         
         {/* Badge Alta Demanda ou HOT */}
         {product.desconto ? (
-          <div className="absolute bottom-3 left-3 px-3 py-1.5 bg-[#D0011B] text-white text-[10px] font-black rounded-full flex items-center gap-1.5 shadow-[0_12px_24px_rgba(208,1,27,0.4)] border border-white/20 uppercase tracking-widest">
+          <div className="absolute bottom-3 left-3 px-3 py-1.5 bg-[#D0011B] text-white text-[10px] font-bold rounded-full flex items-center gap-1.5 shadow-[0_12px_24px_rgba(208,1,27,0.4)] border border-white/20 tracking-widest">
             <span>🔥</span>
-            HOT {product.desconto} OFF
+            Hot {product.desconto} OFF
           </div>
         ) : (
-          <div className="absolute bottom-3 left-3 px-3 py-1.5 bg-[#D0011B] text-white text-[10px] font-black rounded-full flex items-center gap-1.5 shadow-[0_12px_24px_rgba(208,1,27,0.4)] border border-white/20 uppercase tracking-widest">
+          <div className="absolute bottom-3 left-3 px-3 py-1.5 bg-[#D0011B] text-white text-[10px] font-bold rounded-full flex items-center gap-1.5 shadow-[0_12px_24px_rgba(208,1,27,0.4)] border border-white/20 tracking-widest">
             <TrendingUp size={12} />
-            ALTÍSSIMA DEMANDA
+            Demanda em alta
           </div>
         )}
 
         {/* Overlay ao Hover */}
         <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-400 flex items-center justify-center">
-          <div className="px-6 py-3 bg-[#D0011B] text-white rounded-full text-[13px] font-black uppercase tracking-widest transform translate-y-4 group-hover:translate-y-0 transition-transform duration-400 shadow-[0_12px_32px_rgba(208,1,27,0.4)]">
+          <div className="px-6 py-3 bg-[#D0011B] text-white rounded-full text-[13px] font-bold tracking-widest transform translate-y-4 group-hover:translate-y-0 transition-transform duration-400 shadow-[0_12px_32px_rgba(208,1,27,0.4)]">
             Analisar Produto
           </div>
         </div>
@@ -104,7 +104,7 @@ export default function ProductCard({
       <div className="p-4 flex flex-col gap-2">
         
         {/* Nome produto */}
-        <h3 className="text-[13px] font-bold text-white/90 line-clamp-2 leading-[1.4] mb-1 min-h-[36px] tracking-tight group-hover:text-white transition-colors">
+        <h3 className="text-[13px] font-bold text-gray-900 dark:text-white/90 line-clamp-2 leading-[1.4] mb-1 min-h-[36px] tracking-tight group-hover:text-[#D0011B] dark:group-hover:text-white transition-colors">
           {product.nome}
         </h3>
 
@@ -114,29 +114,28 @@ export default function ProductCard({
             {product.preco}
           </span>
           {product.precoOriginal && (
-            <span className="text-[11px] text-white/30 line-through font-medium">
+            <span className="text-[11px] text-gray-400 dark:text-white/30 line-through font-medium">
               {product.precoOriginal}
             </span>
           )}
         </div>
 
         {/* Linha de stats */}
-        <div className="flex items-center gap-4 text-[11px] text-white/40 mb-1 font-bold uppercase tracking-wider">
-          <div className="flex items-center gap-1 text-yellow-400">
+        <div className="flex items-center gap-4 text-[11px] text-gray-500 dark:text-white/40 mb-1 font-bold tracking-wider">
+          <div className="flex items-center gap-1 text-yellow-500">
             <Star size={12} fill="currentColor" />
             <span>{product.avaliacao}</span>
           </div>
-          <div className="w-1 h-1 rounded-full bg-white/10" />
+          <div className="w-1 h-1 rounded-full bg-gray-200 dark:bg-white/10" />
           <span>{product.vendas} vendidos</span>
         </div>
 
-        {/* Score Viral */}
         <div className="mt-1 space-y-1.5">
-          <div className="flex justify-between items-center text-[9px] font-black text-white/30 uppercase tracking-[0.2em]">
+          <div className="flex justify-between items-center text-[9px] font-bold text-gray-400 dark:text-white/30 tracking-[0.2em]">
             <span>Score Viral</span>
             <span className="text-[#D0011B]">{product.scoreViral}%</span>
           </div>
-          <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden border border-white/5">
+          <div className="w-full h-1 bg-gray-100 dark:bg-white/5 rounded-full overflow-hidden border border-gray-100 dark:border-white/5">
             <div 
               className="h-full bg-gradient-to-r from-[#D0011B] to-[#ff4444] rounded-full shadow-[0_0_8px_rgba(208,1,27,0.4)]" 
               style={{ width: `${product.scoreViral}%` }}
@@ -155,7 +154,7 @@ export default function ProductCard({
           className="btn-custom w-full !py-2.5 !px-3 !text-[11px] !rounded-xl flex items-center justify-center gap-2 mt-2 opacity-95 hover:opacity-100"
         >
           <ExternalLink size={14} />
-          <span className="font-black uppercase tracking-widest">Link de Afiliado</span>
+          <span className="font-bold tracking-widest">Afiliar</span>
         </button>
       </div>
     </div>

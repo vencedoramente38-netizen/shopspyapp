@@ -154,7 +154,7 @@ export default function Sidebar({ isExpanded, setIsExpanded, activeItem, onItemC
             onClick={handleLogout}
             className={`w-full h-10 flex items-center transition-all duration-200 cursor-pointer relative ${
               isExpanded ? 'px-4 rounded-full justify-start' : 'justify-center rounded-full'
-            } hover:bg-white/5 text-white/50 hover:text-[#D0011B]`}
+            } glass-obsidian-button text-red-500 hover:text-[#D0011B] dark:text-red-400`}
           >
             <LogOut size={16} />
             {isExpanded && (
@@ -208,19 +208,19 @@ function SidebarItem({
           : isActive
             ? 'glass-obsidian-nav-active'
             : isCapsule
-              ? 'bg-white/[0.04] border border-white/5 text-[#D0011B] hover:bg-white/[0.08]'
-              : 'text-white/50 hover:glass-obsidian-nav-hover'
+              ? 'glass-obsidian-button text-[#D0011B] !text-[#D0011B]'
+              : 'glass-obsidian-button glass-obsidian-nav-hover'
       }`}
     >
       <Icon 
         size={16} 
-        className={`transition-transform duration-200 ${isHovered && isExpanded ? 'translate-x-1' : ''} ${isActive ? 'text-white' : ''}`}
+        className={`transition-transform duration-200 ${isHovered && isExpanded ? 'translate-x-1' : ''} ${isActive ? 'text-white' : isCapsule ? 'text-[#D0011B]' : ''}`}
       />
       
       {isExpanded && (
         <span 
           className={`ml-3 truncate leading-none ${
-            isCapsule ? 'text-[11px] font-black uppercase tracking-wider' : 'text-[13px] font-bold'
+            isCapsule ? 'text-[11px] font-black uppercase tracking-wider text-[#D0011B]' : 'text-[13px] font-bold'
           }`}
         >
           {item.label}

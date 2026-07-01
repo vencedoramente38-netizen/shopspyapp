@@ -697,7 +697,7 @@ export default function LandingPage({ onEnterLogin }: LandingPageProps) {
       </AnimatePresence>
 
       {/* SEÇÃO HERO */}
-      <header id="inicio" className="relative pt-[160px] pb-20 w-full text-center bg-transparent overflow-hidden">
+      <header id="inicio" className="relative pt-[80px] pb-0 w-full text-center bg-transparent overflow-hidden">
         {/* Soft background ambient radial gradient color */}
         <div 
           className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[600px] -z-10 rounded-full select-none pointer-events-none" 
@@ -720,7 +720,7 @@ export default function LandingPage({ onEnterLogin }: LandingPageProps) {
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          className="relative w-full overflow-hidden shadow-[0_24px_80px_rgba(208,1,27,0.12)] border-y border-[#D0011B]/10"
+          className="relative w-full overflow-hidden shadow-[0_24px_80px_rgba(208,1,27,0.12)] border-b border-[#D0011B]/10"
         >
           <img 
             src="https://i.postimg.cc/B6NJvG7r/Cinematic-ultra-wide-hero-banner-image-202606262228.jpg" 
@@ -962,18 +962,18 @@ export default function LandingPage({ onEnterLogin }: LandingPageProps) {
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     id="coupon-toast-success"
-                    className="flex items-center gap-3 bg-[#1e293b] border border-blue-500/20 rounded-full py-2.5 px-5 shadow-lg w-full max-w-sm justify-between"
+                    className="flex items-center gap-3 bg-white border border-[#D0011B]/15 rounded-full py-2.5 px-5 shadow-lg w-full max-w-sm justify-between"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-400">
+                      <div className="w-8 h-8 rounded-full bg-[#D0011B]/10 flex items-center justify-center text-[#D0011B]">
                         <Gift size={18} />
                       </div>
                       <div className="text-left font-sans">
                         <p className="text-[10px] font-bold text-gray-400 uppercase leading-none">Cupom Aplicado</p>
-                        <p className="text-sm font-black text-white">{coupon || 'SHOPSPY2026'}</p>
+                        <p className="text-sm font-black text-gray-900">{coupon || 'SHOPSPY2026'}</p>
                       </div>
                     </div>
-                    <button onClick={() => setCouponApplied(false)} className="text-gray-400 hover:text-white transition-colors bg-transparent border-none cursor-pointer">
+                    <button onClick={() => setCouponApplied(false)} className="text-gray-400 hover:text-gray-900 transition-colors bg-transparent border-none cursor-pointer">
                       <X size={14} />
                     </button>
                   </motion.div>
@@ -981,13 +981,13 @@ export default function LandingPage({ onEnterLogin }: LandingPageProps) {
                   <motion.div
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
-                    className="flex items-center gap-3 bg-[#1e293b] border border-blue-500/20 rounded-full py-2.5 px-5 shadow-lg w-full max-w-sm"
+                    className="flex items-center gap-3 bg-white border border-[#D0011B]/15 rounded-full py-2.5 px-5 shadow-lg w-full max-w-sm"
                   >
-                    <div className="w-8 h-8 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-400 shrink-0">
+                    <div className="w-8 h-8 rounded-full bg-[#D0011B]/10 flex items-center justify-center text-[#D0011B] shrink-0">
                       <Heart size={18} />
                     </div>
-                    <p className="text-[11px] sm:text-[12px] font-semibold text-gray-200 text-left leading-tight">
-                      O usuário que indicou <span className="font-black text-white">abriu mão de qualquer recompensa</span> para destinar créditos infinitos à sua conta.
+                    <p className="text-[11px] sm:text-[12px] font-semibold text-gray-600 text-left leading-tight">
+                      O usuário que indicou <span className="font-black text-gray-900">abriu mão de qualquer recompensa</span> para destinar créditos infinitos à sua conta.
                     </p>
                   </motion.div>
                 </div>
@@ -1111,8 +1111,8 @@ export default function LandingPage({ onEnterLogin }: LandingPageProps) {
             {/* VITALÍCIO CARD DESTAQUE */}
             <div className={`rounded-[40px] px-8 py-12 flex flex-col justify-between h-full relative overflow-hidden transition-all duration-500 border ${
               couponApplied 
-                ? 'border-[#D0011B] glass-obsidian !bg-[#D0011B]/5 shadow-[0_25px_60px_rgba(208,1,27,0.16)] scale-[1.01]' 
-                : 'border-white/10 glass-obsidian shadow-[0_25px_50px_-12px_rgba(0,0,0,0.3)] hover:border-[#D0011B]/40'
+                ? 'border-[#D0011B] bg-white shadow-[0_25px_60px_rgba(208,1,27,0.16)] scale-[1.01]' 
+                : 'border-neutral-200/80 bg-white shadow-[0_25px_50px_-12px_rgba(0,0,0,0.06)] hover:border-[#D0011B]/40'
             }`}>
               {/* Shine effect animation div */}
               <div className="absolute inset-0 pointer-events-none opacity-25 bg-[linear-gradient(120deg,rgba(255,255,255,0)30%,rgba(208,1,27,0.06)50%,rgba(255,255,255,0)70%)] animate-shine-effect z-[1]" />
